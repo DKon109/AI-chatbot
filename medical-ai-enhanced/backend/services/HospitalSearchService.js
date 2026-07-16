@@ -18,7 +18,7 @@ class HospitalSearchService {
   async searchHospitals(latitude, longitude, radius = 5000, symptoms = []) {
     try {
       if (!this.googleMapsApiKey) {
-        throw new Error('Google Maps API is not configured');
+        return await this.searchOpenStreetMapHospitals(latitude, longitude, radius, symptoms);
       }
 
       console.log(`Searching hospitals near ${latitude}, ${longitude} for symptoms:`, symptoms);
@@ -56,6 +56,126 @@ class HospitalSearchService {
         error: error.message
       };
     }
+  }
+
+  /**
+   * Free, API-keyless fallback using OpenStreetMap healthcare data.
+   */
+  async searchOpenStreetMapHospitals(latitude, longitude, radius = 5000, symptoms = []) {
+    const safeRadius = Math.min(Math.max(Number(radius) || 5000, 1000), 20000);
+    const relevantSpecialties = HospitalSpecialtyService.mapSymptomsToSpecialties(symptoms);
+    const query = `[out:json][timeout:20];nwr[amenity~"^(hospital|clinic|doctors)$"](around:${safeRadius},${latitude},${longitude});out center tags 40;`;
+
+    try {
+      const response = await axios.get('https://overpass-api.de/api/interpreter', {
+        params: { data: query },
+        timeout: 25000,
+        headers: {
+          'User-Agent': 'MedAI-Pro-Portfolio/1.0 (educational healthcare demo)'
+        }
+      });
+
+      const seen = new Set();
+      const hospitals = (response.data.elements || [])
+        .map((element) => this.mapOpenStreetMapHospital(
+          element,
+          relevantSpecialties,
+          latitude,
+          longitude
+        ))
+        .filter(Boolean)
+        .filter((hospital) => {
+          const key = `${hospital.name}|${hospital.geometry.location.lat.toFixed(4)}|${hospital.geometry.location.lng.toFixed(4)}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .sort((a, b) => {
+          if (a.relevance_score !== b.relevance_score) {
+            return b.relevance_score - a.relevance_score;
+          }
+          return a.distance - b.distance;
+        })
+        .slice(0, 20);
+
+      return {
+        success: true,
+        data: {
+          hospitals,
+          searchLocation: { latitude, longitude },
+          searchRadius: safeRadius,
+          relevantSpecialties,
+          totalFound: hospitals.length,
+          provider: 'OpenStreetMap'
+        }
+      };
+    } catch (error) {
+      console.error('OpenStreetMap hospital search failed:', error.message);
+      return {
+        success: true,
+        data: {
+          hospitals: [],
+          searchLocation: { latitude, longitude },
+          searchRadius: safeRadius,
+          relevantSpecialties,
+          totalFound: 0,
+          provider: 'OpenStreetMap',
+          external_search_url: this.createExternalHospitalSearchUrl(latitude, longitude)
+        }
+      };
+    }
+  }
+
+  mapOpenStreetMapHospital(element, relevantSpecialties, userLat, userLng) {
+    const latitude = element.lat ?? element.center?.lat;
+    const longitude = element.lon ?? element.center?.lon;
+    const tags = element.tags || {};
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+
+    const name = tags.name || tags['name:en'] || 'Healthcare facility';
+    const specialties = (tags['healthcare:speciality'] || tags.speciality || 'general')
+      .split(/[;,]/)
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean);
+    const relevanceScore = HospitalSpecialtyService.calculateRelevanceScore(
+      specialties,
+      relevantSpecialties
+    );
+    const distance = this.calculateDistance(userLat, userLng, latitude, longitude);
+    const address = [
+      tags['addr:housenumber'],
+      tags['addr:street'],
+      tags['addr:suburb'],
+      tags['addr:city']
+    ].filter(Boolean).join(' ') || tags.operator || 'Address available in OpenStreetMap';
+
+    return {
+      place_id: `osm:${latitude},${longitude}`,
+      name,
+      vicinity: address,
+      rating: 0,
+      user_ratings_total: 0,
+      price_level: 0,
+      geometry: { location: { lat: latitude, lng: longitude } },
+      types: [tags.amenity || tags.healthcare || 'healthcare'],
+      website: tags.website || tags['contact:website'] || null,
+      formatted_phone_number: tags.phone || tags['contact:phone'] || null,
+      opening_hours: null,
+      specialties,
+      relevance_score: relevanceScore,
+      is_specialized: relevanceScore > 0.3,
+      is_highly_specialized: relevanceScore > 0.7,
+      distance,
+      travel_time: `Approx. ${Math.max(3, Math.round(distance / 0.65))} min drive`,
+      travel_distance: `${distance.toFixed(1)} km`,
+      travel_time_value: Math.round((distance / 40) * 3600),
+      travel_distance_value: Math.round(distance * 1000),
+      data_source: 'OpenStreetMap'
+    };
+  }
+
+  createExternalHospitalSearchUrl(latitude, longitude) {
+    return `https://www.google.com/maps/search/hospital/@${latitude},${longitude},13z`;
   }
 
   /**
@@ -323,6 +443,22 @@ class HospitalSearchService {
    * Get directions to a hospital
    */
   async getDirectionsToHospital(hospitalPlaceId, userLat, userLng) {
+    if (hospitalPlaceId.startsWith('osm:')) {
+      const [hospitalLat, hospitalLng] = hospitalPlaceId.slice(4).split(',').map(Number);
+      if (!Number.isFinite(hospitalLat) || !Number.isFinite(hospitalLng)) {
+        return { success: false, error: 'Invalid hospital location' };
+      }
+
+      return {
+        success: true,
+        directions_url: `https://www.google.com/maps/dir/?api=1&destination=${hospitalLat},${hospitalLng}&origin=${userLat},${userLng}`,
+        hospital_location: { lat: hospitalLat, lng: hospitalLng },
+        distance: this.calculateDistance(userLat, userLng, hospitalLat, hospitalLng),
+        travel_time: 'Open in maps for live travel time',
+        travel_distance: 'Calculated by your map provider'
+      };
+    }
+
     const url = `${this.baseUrl}/details/json`;
     const params = {
       place_id: hospitalPlaceId,

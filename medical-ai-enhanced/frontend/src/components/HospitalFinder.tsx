@@ -45,6 +45,8 @@ const HospitalFinder: React.FC<HospitalFinderProps> = ({ symptoms, onLocationUpd
   const [searchRadius, setSearchRadius] = useState(5000);
   const [showManualLocation, setShowManualLocation] = useState(false);
   const [manualLocation, setManualLocation] = useState({ lat: '', lng: '' });
+  const [externalSearchUrl, setExternalSearchUrl] = useState<string | null>(null);
+  const [dataProvider, setDataProvider] = useState<string | null>(null);
 
   // Request user location with proper permission handling
   const requestUserLocation = () => {
@@ -197,6 +199,7 @@ const HospitalFinder: React.FC<HospitalFinderProps> = ({ symptoms, onLocationUpd
     try {
       setIsLoading(true);
       setError(null);
+      setExternalSearchUrl(null);
 
       console.log('Searching hospitals with:', { lat, lng, searchRadius, symptoms });
       console.log('Auth token in localStorage:', localStorage.getItem('token') ? 'Present' : 'Missing');
@@ -205,6 +208,8 @@ const HospitalFinder: React.FC<HospitalFinderProps> = ({ symptoms, onLocationUpd
       
       if (response.success) {
         setHospitals(response.data.hospitals);
+        setExternalSearchUrl(response.data.external_search_url || null);
+        setDataProvider(response.data.provider || null);
         console.log(`Found ${response.data.hospitals.length} hospitals`);
       } else {
         console.error('Hospital search failed:', response);
@@ -561,15 +566,17 @@ const HospitalFinder: React.FC<HospitalFinderProps> = ({ symptoms, onLocationUpd
                   </h4>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <Star size={14} style={{ color: '#fbbf24' }} />
-                      <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>
-                        {formatRating(hospital.rating)}
-                      </span>
-                      <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                        ({hospital.user_ratings_total} reviews)
-                      </span>
-                    </div>
+                    {hospital.user_ratings_total > 0 && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <Star size={14} style={{ color: '#fbbf24' }} />
+                        <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>
+                          {formatRating(hospital.rating)}
+                        </span>
+                        <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                          ({hospital.user_ratings_total} reviews)
+                        </span>
+                      </div>
+                    )}
                     <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
                       • {formatDistance(hospital.distance)} away
                     </span>
@@ -733,6 +740,11 @@ const HospitalFinder: React.FC<HospitalFinderProps> = ({ symptoms, onLocationUpd
               </div>
             ))}
           </div>
+          {dataProvider === 'OpenStreetMap' && (
+            <p style={{ margin: '1rem 0 0', color: '#64748b', fontSize: '0.75rem', textAlign: 'right' }}>
+              Healthcare facility data © OpenStreetMap contributors
+            </p>
+          )}
         </div>
       )}
 
@@ -750,6 +762,27 @@ const HospitalFinder: React.FC<HospitalFinderProps> = ({ symptoms, onLocationUpd
           <p style={{ margin: 0, fontSize: '0.9rem' }}>
             Try increasing the search radius or check your location.
           </p>
+          {externalSearchUrl && (
+            <a
+              href={externalSearchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                marginTop: '1rem',
+                padding: '0.65rem 1rem',
+                borderRadius: '0.375rem',
+                backgroundColor: '#00684a',
+                color: 'white',
+                textDecoration: 'none',
+                fontWeight: 600
+              }}
+            >
+              <MapPin size={15} /> Open hospital search in Maps
+            </a>
+          )}
         </div>
       )}
     </div>

@@ -31,7 +31,7 @@ router.post('/search', authenticateToken, async (req, res, next) => {
     console.log('Request headers:', req.headers.authorization ? 'Token present' : 'No token');
 
     // Basic validation
-    if (!latitude || !longitude) {
+    if (latitude === undefined || longitude === undefined) {
       return res.status(400).json({
         success: false,
         error: 'Latitude and longitude are required'
