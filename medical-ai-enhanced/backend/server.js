@@ -41,17 +41,29 @@ const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(cors({
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Origin is not allowed by CORS'));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use((req, res, next) => {
+  cors({
+    origin(origin, callback) {
+      // Vite marks production assets as crossorigin. Always allow requests
+      // from this service's own host, including Render and custom domains.
+      const isSameHost = origin && (() => {
+        try {
+          return new URL(origin).host === req.get('host');
+        } catch {
+          return false;
+        }
+      })();
+
+      if (!origin || isSameHost || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Origin is not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  })(req, res, next);
+});
 
 // Logging
 app.use(morgan('combined'));
