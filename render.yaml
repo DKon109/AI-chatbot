@@ -11,7 +11,15 @@ services:
         value: production
       - key: DB_SSL
         value: "true"
-      - key: DATABASE_URL
+      - key: DB_HOST
+        value: aws-1-ap-northeast-2.pooler.supabase.com
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        value: postgres
+      - key: DB_USER
+        value: postgres.ptktzcnqubwvcplawoqt
+      - key: DB_PASSWORD
         sync: false
       - key: JWT_SECRET
         generateValue: true

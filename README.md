@@ -109,10 +109,9 @@ Railway pricing and free allowances can change; review the current plan before d
 The repository includes [`render.yaml`](render.yaml), which creates a Render web service with the Free instance type explicitly selected. Supabase supplies the free hosted PostgreSQL database.
 
 1. Create a Supabase Free project and keep its generated database password private.
-2. In Supabase, open **Connect**, select the session pooler connection string, and replace the password placeholder locally.
-3. In Render, create a new Blueprint from this repository.
-4. Paste the completed connection string into Render's `DATABASE_URL` prompt. Do not commit it or post it in an issue/chat.
-5. Confirm that the service plan is **Free**, then deploy.
+2. In Render, create a new Blueprint from this repository.
+3. Enter only the Supabase database password in Render's `DB_PASSWORD` prompt. Do not commit it or post it in an issue/chat.
+4. Confirm that the service plan is **Free**, then deploy.
 
 The container runs the idempotent migrations and fictional demo seed before starting the server. Render generates `JWT_SECRET` automatically. No OpenAI or Google Maps key is required for the core portfolio demo.
 
