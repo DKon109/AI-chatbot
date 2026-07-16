@@ -13,6 +13,7 @@ import {
   Utensils,
   Heart
 } from 'lucide-react';
+import './InstructionStudio.css';
 
 interface Patient {
   id: string;
@@ -62,7 +63,7 @@ const DoctorPatientInstructions: React.FC = () => {
   const loadPatients = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/patients', {
+      const response = await fetch('/api/doctor/patients', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -70,6 +71,8 @@ const DoctorPatientInstructions: React.FC = () => {
       const data = await response.json();
       if (data.success) {
         setPatients(data.data);
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Failed to load patient accounts' });
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to load patients' });
@@ -116,7 +119,7 @@ const DoctorPatientInstructions: React.FC = () => {
 
       const data = await response.json();
       if (data.success) {
-        setMessage({ type: 'success', text: 'Instructions saved and AI agent generated successfully!' });
+        setMessage({ type: 'success', text: 'Instructions saved and the patient guidance profile is ready.' });
         setInstructions({
           dietary: '',
           exercise: '',
@@ -153,14 +156,14 @@ const DoctorPatientInstructions: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="instruction-studio max-w-7xl mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center">
           <Stethoscope className="w-8 h-8 mr-3 text-blue-600" />
-          Patient AI Instructions
+          Patient Guidance Studio
         </h1>
         <p className="text-gray-600">
-          Create personalized AI agents for your patients based on their specific conditions and your medical instructions.
+          Save structured, patient-specific guidance. The free demo builds a deterministic profile; OpenAI can be enabled separately.
         </p>
       </div>
 

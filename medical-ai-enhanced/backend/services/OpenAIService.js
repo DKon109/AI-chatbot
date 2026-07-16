@@ -11,6 +11,25 @@ class OpenAIService {
    * Generate personalized AI agent based on doctor's input
    */
   async generatePersonalizedAgent(patientData, doctorInstructions) {
+    if (!this.client) {
+      return {
+        generationMode: 'deterministic',
+        patientSummary: {
+          conditions: patientData.conditions || [],
+          medications: patientData.medications || [],
+          allergies: patientData.allergies || []
+        },
+        diet: doctorInstructions.dietary || '',
+        exercise: doctorInstructions.exercise || '',
+        medications: doctorInstructions.medications || '',
+        monitoring: doctorInstructions.monitoring || '',
+        goals: doctorInstructions.goals || '',
+        restrictions: doctorInstructions.restrictions || '',
+        emergency: doctorInstructions.emergency || '',
+        disclaimer: 'Doctor-authored portfolio guidance; not a medical diagnosis.'
+      };
+    }
+
     const prompt = this.createPersonalizedAgentPrompt(patientData, doctorInstructions);
     
     try {

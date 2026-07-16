@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import ApiService from '../services/api';
 import { Patient, DietRecommendation } from '../types';
 import './DashboardTheme.css';
+import DoctorPatientInstructions from './DoctorPatientInstructions';
 
 const DoctorDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'patients' | 'diet' | 'ai-instructions'>('patients');
@@ -653,7 +654,7 @@ const DoctorDashboard: React.FC = () => {
               </div>
             )}
           </div>
-        ) : (
+        ) : activeTab === 'diet' ? (
           <div>
             {/* Diet Recommendations */}
             <div style={{ marginBottom: '2rem' }}>
@@ -785,6 +786,8 @@ const DoctorDashboard: React.FC = () => {
               ))}
             </div>
           </div>
+        ) : (
+          <DoctorPatientInstructions />
         )}
       </main>
 

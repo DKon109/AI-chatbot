@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bot, Stethoscope, User, Shield, Zap, Heart } from 'lucide-react';
 import AuthModal from './AuthModal';
+import './HomeTheme.css';
 
 const HomePage: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -14,14 +15,14 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div style={{
+    <div className="compass-home" style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       display: 'flex',
       flexDirection: 'column'
     }}>
       {/* Header */}
-      <header style={{
+      <header className="compass-home-header" style={{
         padding: '1rem 2rem',
         display: 'flex',
         justifyContent: 'space-between',
@@ -68,7 +69,7 @@ const HomePage: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main style={{
+      <main className="compass-home-main" style={{
         flex: 1,
         display: 'flex',
         alignItems: 'center',
@@ -77,7 +78,7 @@ const HomePage: React.FC = () => {
       }}>
         <div style={{ textAlign: 'center', maxWidth: '1200px', width: '100%' }}>
           {/* Hero Section */}
-          <div style={{ marginBottom: '4rem' }}>
+          <div className="compass-home-hero" style={{ marginBottom: '4rem' }}>
             <div style={{
               width: '120px',
               height: '120px',
@@ -114,14 +115,14 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* Portal Cards */}
-          <div style={{
+          <div className="compass-portal-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
             gap: '2rem',
             marginBottom: '3rem'
           }}>
             {/* Patient Portal */}
-            <div style={{
+            <div className="compass-portal-card patient-card" style={{
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
               borderRadius: '1rem',
               padding: '2rem',
@@ -207,7 +208,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Doctor Portal */}
-            <div style={{
+            <div className="compass-portal-card doctor-card" style={{
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
               borderRadius: '1rem',
               padding: '2rem',
@@ -294,7 +295,7 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* Features */}
-          <div style={{
+          <div className="compass-home-features" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '1.5rem',

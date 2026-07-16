@@ -1,0 +1,194 @@
+.compass-home {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 82% 14%, rgba(0, 237, 100, 0.14), transparent 330px),
+    #f9fbfa !important;
+  color: #001e2b;
+  font-family: "Euclid Circular A", "Inter", "Avenir Next", Avenir,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-align: left;
+}
+
+.compass-home-header {
+  min-height: 64px;
+  padding: 0 32px !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e1e7e5;
+  backdrop-filter: none !important;
+}
+
+.compass-home-header h1,
+.compass-home-header svg {
+  color: #001e2b !important;
+}
+
+.compass-home-header button {
+  min-height: 36px;
+  padding: 8px 14px !important;
+  border: 1px solid #889397 !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  color: #001e2b !important;
+  font-family: inherit;
+}
+
+.compass-home-header button:hover {
+  border-color: #00684a !important;
+  background: #f1f5f4 !important;
+  color: #00684a !important;
+}
+
+.compass-home-main {
+  align-items: flex-start !important;
+  padding: 72px 32px 48px !important;
+}
+
+.compass-home-main > div {
+  max-width: 1120px !important;
+  text-align: left !important;
+}
+
+.compass-home-hero {
+  position: relative;
+  max-width: 790px;
+  margin-bottom: 48px !important;
+}
+
+.compass-home-hero > div:first-child {
+  width: 76px !important;
+  height: 76px !important;
+  margin: 0 0 22px !important;
+  border: 1px solid #80e5c4;
+  border-radius: 12px !important;
+  background: #e3fcf7 !important;
+  backdrop-filter: none !important;
+  animation: none !important;
+}
+
+.compass-home-hero > div:first-child svg {
+  width: 38px;
+  color: #00684a !important;
+}
+
+.compass-home-hero h1 {
+  max-width: 760px;
+  margin: 0 0 16px !important;
+  color: #001e2b !important;
+  font-size: clamp(42px, 6vw, 68px) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+  text-shadow: none !important;
+}
+
+.compass-home-hero p {
+  max-width: 680px !important;
+  margin: 0 !important;
+  color: #3d4f58 !important;
+  font-size: 20px !important;
+  line-height: 1.55;
+}
+
+.compass-portal-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+}
+
+.compass-portal-card {
+  position: relative;
+  overflow: hidden;
+  padding: 30px !important;
+  border: 1px solid #c9d3d0;
+  border-radius: 10px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 6px rgba(0, 30, 43, 0.07) !important;
+  text-align: left;
+}
+
+.compass-portal-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: #00ed64;
+}
+
+.compass-portal-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: #00684a;
+  box-shadow: 0 8px 22px rgba(0, 30, 43, 0.12) !important;
+}
+
+.compass-portal-card > div:first-child {
+  width: 58px !important;
+  height: 58px !important;
+  margin: 0 0 22px !important;
+  border-radius: 8px !important;
+  background: #e3fcf7 !important;
+}
+
+.compass-portal-card > div:first-child svg {
+  color: #00684a !important;
+}
+
+.compass-portal-card h3 {
+  color: #001e2b !important;
+  font-size: 24px !important;
+}
+
+.compass-portal-card p {
+  color: #5c6c75 !important;
+}
+
+.compass-portal-card button {
+  border-radius: 6px !important;
+  font-family: inherit;
+}
+
+.compass-portal-card button:first-child {
+  border: 1px solid #00684a !important;
+  background: #00684a !important;
+}
+
+.compass-portal-card button:last-child {
+  border-color: #00684a !important;
+  color: #00684a !important;
+}
+
+.compass-home-features {
+  border-top: 1px solid #dfe5e3;
+  padding-top: 28px;
+}
+
+.compass-home-features > div {
+  border: 1px solid #dfe5e3;
+  border-radius: 8px !important;
+  background: #fff !important;
+  backdrop-filter: none !important;
+  text-align: left !important;
+}
+
+.compass-home-features h4,
+.compass-home-features svg {
+  color: #00684a !important;
+}
+
+.compass-home-features p {
+  color: #5c6c75 !important;
+}
+
+@media (max-width: 760px) {
+  .compass-home-header {
+    padding: 10px 16px !important;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .compass-home-main {
+    padding: 42px 16px 32px !important;
+  }
+
+  .compass-portal-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

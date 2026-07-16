@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import ApiService from '../services/api';
 import HospitalFinder from './HospitalFinder';
+import './SymptomFlow.css';
 
 interface SymptomCategory {
   id: string;
@@ -66,6 +67,13 @@ const StructuredSymptomAnalysis: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [showHospitalFinder, setShowHospitalFinder] = useState(false);
+
+  const stepOrder = ['categorize', 'select_symptoms', 'answer_questions', 'analyze'] as const;
+  const stepLabels = ['Concern', 'Symptoms', 'Details', 'Guidance'];
+  const currentStepIndex = stepOrder.indexOf(currentStep);
+  const totalQuestionCount = questions.reduce((total, group) => total + group.questions.length, 0);
+  const answeredQuestionCount = Object.values(answers).filter(answer => answer.trim().length > 0).length;
+  const quickAnswers = ['Started today', '1–3 days', 'Mild', 'Moderate', 'Severe', 'Not sure'];
 
 
   const categoryIcons: Record<string, React.ReactNode> = {
@@ -186,10 +194,15 @@ const StructuredSymptomAnalysis: React.FC = () => {
   };
 
   const renderCategories = () => (
-    <div className="space-y-4">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">🏥 Medical Symptom Checker</h2>
-        <p className="text-gray-600">Please select the category that best describes your main concern:</p>
+    <div className="symptom-step category-step">
+      <div className="symptom-intro">
+        <span className="symptom-eyebrow">STEP 1 · MAIN CONCERN</span>
+        <h2>How are you feeling today?</h2>
+        <p>Choose the area that best matches your main concern. You can select specific symptoms next.</p>
+        <div className="symptom-safety-note">
+          <AlertTriangle size={18} />
+          <span>If symptoms are severe or life-threatening, contact local emergency services immediately.</span>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -197,7 +210,7 @@ const StructuredSymptomAnalysis: React.FC = () => {
           <button
             key={category.id}
             onClick={() => handleCategorySelect(category.id)}
-            className="p-6 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 text-left"
+            className="symptom-category-card"
           >
             <div className="flex items-center space-x-3 mb-2">
               <span className="text-2xl">{category.icon}</span>
@@ -212,8 +225,8 @@ const StructuredSymptomAnalysis: React.FC = () => {
   );
 
   const renderSymptoms = () => (
-    <div className="space-y-4">
-      <div className="text-center mb-6">
+    <div className="symptom-step">
+      <div className="symptom-step-heading">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           {categoryIcons[selectedCategory]} {categories.find(c => c.id === selectedCategory)?.name} Symptoms
         </h2>
@@ -222,7 +235,7 @@ const StructuredSymptomAnalysis: React.FC = () => {
       
       <div className="space-y-3">
         {symptoms.map((symptom) => (
-          <label key={symptom.id} className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+          <label key={symptom.id} className={`symptom-option ${selectedSymptoms.includes(symptom.id) ? 'is-selected' : ''}`}>
             <input
               type="checkbox"
               checked={selectedSymptoms.includes(symptom.id)}
@@ -248,7 +261,7 @@ const StructuredSymptomAnalysis: React.FC = () => {
         ))}
       </div>
       
-      <div className="flex justify-between mt-6">
+      <div className="symptom-actions">
         <button
           onClick={() => setCurrentStep('categorize')}
           className="px-4 py-2 text-gray-600 hover:text-gray-800"
@@ -267,35 +280,52 @@ const StructuredSymptomAnalysis: React.FC = () => {
   );
 
   const renderQuestions = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">📋 Symptom Details</h2>
-        <p className="text-gray-600">Please answer these questions to help us better understand your condition:</p>
+    <div className="symptom-step question-step">
+      <div className="symptom-step-heading">
+        <span className="symptom-eyebrow">STEP 3 · DETAILS</span>
+        <h2>Tell us a little more</h2>
+        <p>Short answers are fine. Use a suggestion when it fits, or describe the symptom in your own words.</p>
+        <div className="question-progress">
+          <span>{answeredQuestionCount} of {totalQuestionCount} questions answered</span>
+          <div><span style={{ width: `${totalQuestionCount ? (answeredQuestionCount / totalQuestionCount) * 100 : 0}%` }} /></div>
+        </div>
       </div>
       
       {questions.map((questionGroup, index) => (
-        <div key={index} className="border border-gray-200 rounded-lg p-6">
+        <div key={index} className="question-group-card">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">{questionGroup.symptomName}</h3>
           <div className="space-y-4">
             {questionGroup.questions.map((question) => (
-              <div key={question.id}>
+              <div key={question.id} className="question-field">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {question.question}
                 </label>
                 <textarea
                   value={answers[question.id] || ''}
                   onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                  placeholder="Please describe your experience..."
+                  placeholder="Example: It started yesterday and feels worse when I move."
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={2}
                 />
+                <div className="quick-answer-row" aria-label="Quick answer suggestions">
+                  {quickAnswers.map((answer) => (
+                    <button
+                      type="button"
+                      key={answer}
+                      className={answers[question.id] === answer ? 'is-selected' : ''}
+                      onClick={() => handleAnswerChange(question.id, answer)}
+                    >
+                      {answer}
+                    </button>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
       ))}
       
-      <div className="border border-gray-200 rounded-lg p-4">
+      <div className="location-card">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           <MapPin className="w-4 h-4 inline mr-2" />
           Your Location (for hospital recommendations)
@@ -309,7 +339,7 @@ const StructuredSymptomAnalysis: React.FC = () => {
         />
       </div>
       
-      <div className="flex justify-between mt-6">
+      <div className="symptom-actions">
         <button
           onClick={() => setCurrentStep('select_symptoms')}
           className="px-4 py-2 text-gray-600 hover:text-gray-800"
@@ -327,7 +357,7 @@ const StructuredSymptomAnalysis: React.FC = () => {
   );
 
   const renderAnalysis = () => (
-    <div className="space-y-6">
+    <div className="symptom-step analysis-step">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">🔍 Analysis Complete</h2>
       </div>
@@ -473,7 +503,15 @@ const StructuredSymptomAnalysis: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="symptom-flow">
+      <div className="symptom-progress-rail" aria-label="Symptom checker progress">
+        {stepLabels.map((label, index) => (
+          <div key={label} className={index <= currentStepIndex ? 'is-active' : ''}>
+            <span>{index + 1}</span>
+            <strong>{label}</strong>
+          </div>
+        ))}
+      </div>
       {currentStep === 'categorize' && renderCategories()}
       {currentStep === 'select_symptoms' && renderSymptoms()}
       {currentStep === 'answer_questions' && renderQuestions()}

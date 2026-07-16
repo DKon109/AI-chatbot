@@ -1,9 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const DoctorInputService = require('../services/DoctorInputService');
-const { requireAuth, requireDoctor, requirePatient } = require('../middleware/auth');
+const { authenticateToken, requireDoctor, requirePatient } = require('../middleware/auth');
 
 const doctorInputService = new DoctorInputService();
+
+router.use(authenticateToken);
+
+/**
+ * @route GET /api/doctor/patients
+ * @desc List patient accounts that can receive a personalized guidance profile
+ * @access Doctor
+ */
+router.get('/patients', requireDoctor, async (req, res, next) => {
+  try {
+    const patients = await doctorInputService.getPatientAccounts();
+    res.json({ success: true, data: patients });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * @route POST /api/doctor/instructions

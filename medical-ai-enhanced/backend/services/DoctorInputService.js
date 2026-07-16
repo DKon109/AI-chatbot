@@ -6,6 +6,23 @@ class DoctorInputService {
     this.openai = new OpenAIService();
   }
 
+  parseJsonValue(value) {
+    if (value === null || value === undefined) return value;
+    return typeof value === 'string' ? JSON.parse(value) : value;
+  }
+
+  async getPatientAccounts() {
+    const result = await pool.query(`
+      SELECT id, name, email, NULL::integer AS age, NULL::text AS gender, medical_conditions,
+             medications, allergies, fitness_level
+      FROM users
+      WHERE user_type = 'patient' AND is_active = true
+      ORDER BY name ASC
+    `);
+
+    return result.rows;
+  }
+
   /**
    * Store doctor's instructions for a patient
    */
@@ -73,8 +90,8 @@ class DoctorInputService {
       }
 
       return {
-        agentConfig: JSON.parse(result.rows[0].agent_config),
-        instructions: JSON.parse(result.rows[0].instructions),
+        agentConfig: this.parseJsonValue(result.rows[0].agent_config),
+        instructions: this.parseJsonValue(result.rows[0].instructions),
         lastUpdated: result.rows[0].created_at
       };
     } finally {
@@ -97,7 +114,7 @@ class DoctorInputService {
     try {
       const result = await client.query(`
         SELECT 
-          u.id, u.name, u.email, u.age, u.gender,
+          u.id, u.name, u.email, NULL::integer AS age, NULL::text AS gender,
           u.medical_conditions, u.medications, u.allergies,
           u.fitness_level, u.preferences
         FROM users u
@@ -298,7 +315,7 @@ class DoctorInputService {
 
       return result.rows.map(row => ({
         id: row.id,
-        instructions: JSON.parse(row.instructions),
+        instructions: this.parseJsonValue(row.instructions),
         createdAt: row.created_at,
         doctorName: row.doctor_name,
         doctorEmail: row.doctor_email
