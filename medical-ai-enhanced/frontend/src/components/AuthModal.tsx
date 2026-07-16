@@ -64,6 +64,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, userType, onClose }) => {
     }));
   };
 
+  const fillDemoCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      email: userType === 'patient'
+        ? 'demo.patient@example.com'
+        : 'demo.doctor@example.com',
+      password: 'PortfolioDemo!2026'
+    }));
+    setError('');
+  };
+
   return (
     <div style={{
       position: 'fixed',
@@ -137,6 +148,35 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, userType, onClose }) => {
             fontSize: '0.9rem'
           }}>
             {error}
+          </div>
+        )}
+
+        {mode === 'login' && (
+          <div style={{
+            backgroundColor: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '0.5rem',
+            padding: '0.75rem',
+            marginBottom: '1rem',
+            textAlign: 'center'
+          }}>
+            <p style={{ color: '#475569', fontSize: '0.85rem', margin: '0 0 0.5rem' }}>
+              Portfolio demo using fictional data
+            </p>
+            <button
+              type="button"
+              onClick={fillDemoCredentials}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: userType === 'patient' ? '#2563eb' : '#059669',
+                cursor: 'pointer',
+                fontWeight: '600',
+                padding: '0.25rem'
+              }}
+            >
+              Fill demo credentials
+            </button>
           </div>
         )}
 

@@ -2,7 +2,7 @@
 
 Full-stack healthcare portfolio application with separate patient and doctor experiences, structured symptom analysis, patient record management, and AI-assisted health guidance.
 
-> **Portfolio status:** deployment configuration is ready. The public demo URL will be added after the first cloud deployment.
+> **Live portfolio demo:** [medai-pro-portfolio.onrender.com](https://medai-pro-portfolio.onrender.com/)
 
 ## Product overview
 
@@ -41,7 +41,7 @@ The production container builds the React frontend and serves it from Express. T
 | Frontend | React 19, TypeScript, Vite, React Router, Axios, Lucide React |
 | Backend | Node.js, Express, JWT, bcrypt, Helmet, express-validator |
 | Data | PostgreSQL, SQL migrations, UUID primary keys |
-| AI workflow | Multi-agent services, structured symptom analysis, optional OpenAI integration |
+| AI workflow | Deterministic symptom analysis, multi-agent service design, optional OpenAI integration |
 | Delivery | Docker, Render/Railway config-as-code, health checks |
 
 ## Demo accounts

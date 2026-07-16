@@ -308,9 +308,9 @@ const HomePage: React.FC = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Zap size={32} color="white" style={{ marginBottom: '1rem' }} />
-              <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>AI-Powered</h4>
+              <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Structured Guidance</h4>
               <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem' }}>
-                Advanced AI technology for accurate health assessments
+                Deterministic symptom analysis with safety-focused recommendations
               </p>
             </div>
             <div style={{
@@ -321,9 +321,9 @@ const HomePage: React.FC = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Shield size={32} color="white" style={{ marginBottom: '1rem' }} />
-              <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Secure & Private</h4>
+              <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Role-Based Access</h4>
               <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem' }}>
-                Your health data is protected with enterprise-grade security
+                Separate patient and doctor workflows with authenticated routes
               </p>
             </div>
             <div style={{
@@ -334,9 +334,9 @@ const HomePage: React.FC = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Heart size={32} color="white" style={{ marginBottom: '1rem' }} />
-              <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>24/7 Available</h4>
+              <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Portfolio Demo</h4>
               <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem' }}>
-                Get health support whenever you need it, day or night
+                Educational prototype using fictional data, not medical advice
               </p>
             </div>
           </div>
