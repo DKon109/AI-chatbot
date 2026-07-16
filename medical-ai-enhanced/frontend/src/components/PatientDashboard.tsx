@@ -11,7 +11,10 @@ const PatientDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'symptom-checker' | 'food-analysis' | 'exercises' | 'reports' | 'motivation' | 'prescriptions'>('symptom-checker');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
-  const input = '';
+  const [foodDescription, setFoodDescription] = useState('');
+  const [foodAnalysisResult, setFoodAnalysisResult] = useState('');
+  const [foodAnalysisError, setFoodAnalysisError] = useState('');
+  const [isAnalyzingFood, setIsAnalyzingFood] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { user, logout } = useAuth();
@@ -40,8 +43,35 @@ const PatientDashboard: React.FC = () => {
   const removeImage = () => {
     setSelectedImage(null);
     setImagePreview('');
+    setFoodAnalysisResult('');
+    setFoodAnalysisError('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const analyzeSelectedFood = async () => {
+    if (!selectedImage) return;
+    if (foodDescription.trim().length < 3) {
+      setFoodAnalysisError('Please describe the main ingredients or dish before analyzing.');
+      return;
+    }
+
+    setIsAnalyzingFood(true);
+    setFoodAnalysisError('');
+    setFoodAnalysisResult('');
+    try {
+      const response = await ApiService.analyzeFoodImage(selectedImage, foodDescription.trim());
+      if (response.success) {
+        setFoodAnalysisResult(response.data.aiMessage.message);
+      } else {
+        setFoodAnalysisError('The meal could not be analyzed. Please revise the description and try again.');
+      }
+    } catch (error) {
+      console.error('Food analysis failed:', error);
+      setFoodAnalysisError('Food analysis is temporarily unavailable. Please try again.');
+    } finally {
+      setIsAnalyzingFood(false);
     }
   };
 
@@ -314,7 +344,7 @@ const PatientDashboard: React.FC = () => {
                 Food Analysis
               </h2>
               <p style={{ margin: 0, color: '#64748b' }}>
-                Upload a photo of your food to get detailed nutritional analysis and recommendations
+                Add a photo and describe the ingredients for a transparent, rule-based nutrition estimate
               </p>
             </div>
             
@@ -374,21 +404,38 @@ const PatientDashboard: React.FC = () => {
                   marginBottom: '1rem'
                   }} 
                 />
+                <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
+                  <label htmlFor="food-description" style={{ display: 'block', marginBottom: '0.5rem', color: '#001e2b', fontWeight: 650 }}>
+                    What is in this meal?
+                  </label>
+                  <textarea
+                    id="food-description"
+                    value={foodDescription}
+                    onChange={(event) => setFoodDescription(event.target.value)}
+                    placeholder="Example: grilled chicken, broccoli, brown rice and tomato salad"
+                    rows={3}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '1px solid #889397',
+                      borderRadius: '0.375rem',
+                      resize: 'vertical',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                  <p style={{ margin: '0.4rem 0 0', color: '#64748b', fontSize: '0.78rem' }}>
+                    The free demo estimates nutrition from this description; it does not use image-recognition AI.
+                  </p>
+                </div>
+                {foodAnalysisError && (
+                  <div style={{ marginBottom: '1rem', padding: '0.75rem', border: '1px solid #fecaca', borderRadius: '0.375rem', background: '#fef2f2', color: '#b91c1c' }}>
+                    {foodAnalysisError}
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button
-                    onClick={async () => {
-                      if (selectedImage) {
-                        try {
-                          const response = await ApiService.analyzeFoodImage(selectedImage, input);
-                          if (response.success) {
-                            // Show analysis result
-                            alert('Food analysis completed! Check the analysis results.');
-                          }
-                        } catch (error) {
-                          console.error('Food analysis failed:', error);
-                        }
-                      }
-                    }}
+                    onClick={analyzeSelectedFood}
+                    disabled={isAnalyzingFood}
                     style={{
                       flex: 1,
                       padding: '0.75rem 1.5rem',
@@ -396,11 +443,12 @@ const PatientDashboard: React.FC = () => {
                       color: 'white',
                       border: 'none',
                       borderRadius: '0.5rem',
-                      cursor: 'pointer',
+                      cursor: isAnalyzingFood ? 'not-allowed' : 'pointer',
+                      opacity: isAnalyzingFood ? 0.65 : 1,
                       fontWeight: '500'
                     }}
                   >
-                    Analyze Food
+                    {isAnalyzingFood ? 'Analyzing meal...' : 'Analyze Meal'}
                   </button>
                   <button
                     onClick={removeImage}
@@ -417,6 +465,17 @@ const PatientDashboard: React.FC = () => {
                     Remove
                   </button>
                 </div>
+                {foodAnalysisResult && (
+                  <div style={{ marginTop: '1rem', padding: '1.25rem', border: '1px solid #b7dfd1', borderRadius: '0.5rem', background: '#f2faf7', textAlign: 'left' }}>
+                    <h3 style={{ margin: '0 0 0.75rem', color: '#00684a' }}>Nutrition guidance</h3>
+                    <div style={{ color: '#33474f', whiteSpace: 'pre-wrap', lineHeight: 1.65 }}>
+                      {foodAnalysisResult.replace(/\*\*/g, '')}
+                    </div>
+                    <p style={{ margin: '0.9rem 0 0', color: '#64748b', fontSize: '0.78rem' }}>
+                      Educational estimate only. It is not a diagnosis or a substitute for dietary advice from a clinician.
+                    </p>
+                  </div>
+                )}
               </div>
                     )}
                   </div>

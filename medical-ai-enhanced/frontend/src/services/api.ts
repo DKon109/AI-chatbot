@@ -167,12 +167,22 @@ class ApiService {
       
       // Get the primary message from NutritionAgent if available
       let primaryMessage = aiResponse.message;
-      if (agentResults?.nutrition?.success && agentResults.nutrition.validation?.message) {
-        primaryMessage = agentResults.nutrition.validation.message;
+      if (agentResults?.nutrition?.success) {
+        const nutrition = agentResults.nutrition;
+        const components = nutrition.mealAnalysis?.components || [];
+        const profile = nutrition.mealAnalysis?.nutritionalProfile || {};
+        const status = nutrition.assessment?.status || 'reviewed';
+        primaryMessage = [
+          `Assessment: ${status.replace('_', ' ')}`,
+          components.length ? `Detected from your description: ${components.join(', ')}` : 'No specific ingredients were detected from the description.',
+          `Estimated profile: ${profile.calories || 0} kcal, ${profile.protein || 0}g protein, ${profile.carbohydrates || 0}g carbohydrates, ${profile.fiber || 0}g fiber.`,
+          ...(nutrition.assessment?.warnings || []).map((warning: string) => `Warning: ${warning}`)
+        ].join('\n');
       }
       
       // Add recommendations from the main response
-      const recommendations = aiResponse.recommendations?.map((r: any) => `• ${r.message}`).join('\n') || '';
+      const nutritionRecommendations = agentResults?.nutrition?.recommendations || aiResponse.recommendations || [];
+      const recommendations = nutritionRecommendations.map((r: any) => `• ${r.message}`).join('\n');
       
       const aiMessage: ChatMessage = {
         id: Date.now().toString(),

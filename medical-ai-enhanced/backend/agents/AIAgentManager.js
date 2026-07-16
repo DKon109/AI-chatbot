@@ -268,7 +268,7 @@ class AIAgentManager extends BaseAgent {
         return {
           userId,
           meal: data.meal,
-          condition: data.condition,
+          patientCondition: data.condition || 'general',
           medications: data.medications || [],
           allergies: data.allergies || [],
           preferences: data.preferences || {}
