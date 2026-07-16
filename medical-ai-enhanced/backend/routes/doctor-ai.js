@@ -46,7 +46,9 @@ router.post('/instructions', requireDoctor, async (req, res, next) => {
 
     res.json({
       success: true,
-      message: 'Doctor instructions stored and personalized AI agent generated',
+      message: result.personalizedAgent?.generationMode === 'deterministic'
+        ? 'Doctor instructions stored and deterministic guidance profile generated'
+        : 'Doctor instructions stored and personalized AI agent generated',
       data: result
     });
   } catch (error) {

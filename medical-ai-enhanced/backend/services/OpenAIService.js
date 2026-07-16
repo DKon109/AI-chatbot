@@ -218,7 +218,7 @@ PATIENT DATA:
 - Fitness Level: ${patientData.fitnessLevel || 'Not specified'}
 
 DOCTOR INSTRUCTIONS:
-${doctorInstructions}
+${JSON.stringify(doctorInstructions, null, 2)}
 
 Please create a personalized AI agent configuration that includes:
 1. Specific dietary recommendations based on patient conditions

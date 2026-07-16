@@ -366,12 +366,12 @@ const DoctorPatientInstructions: React.FC = () => {
                     {isSaving ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Generating AI Agent...
+                        Saving guidance profile...
                       </>
                     ) : (
                       <>
                         <Save className="w-4 h-4 mr-2" />
-                        Save Instructions & Generate AI Agent
+                        Save patient guidance
                       </>
                     )}
                   </button>
@@ -385,7 +385,7 @@ const DoctorPatientInstructions: React.FC = () => {
                 Select a Patient
               </h3>
               <p className="text-gray-500">
-                Choose a patient from the list to create personalized AI instructions
+                Choose a patient from the list to create a personalized guidance profile
               </p>
             </div>
           )}
