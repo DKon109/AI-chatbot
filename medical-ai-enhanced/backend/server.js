@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const { spawn } = require('child_process');
 require('dotenv').config();
 
 // Import routes
@@ -117,6 +118,28 @@ app.listen(PORT, () => {
   console.log(`📊 Health check: http://localhost:${PORT}/api/status`);
   console.log(`🔐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+
+  // Bind the public port before running idempotent database setup. This keeps
+  // the landing page and health check available during free-tier cold starts.
+  if (process.env.NODE_ENV === 'production' && process.env.RUN_DB_SETUP_ON_START !== 'false') {
+    const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+    const setup = spawn(npmCommand, ['run', 'db:setup'], {
+      env: process.env,
+      stdio: 'inherit',
+    });
+
+    setup.on('error', (error) => {
+      console.error('Database setup could not start:', error.message);
+    });
+
+    setup.on('exit', (code) => {
+      if (code === 0) {
+        console.log('✅ Background database setup completed');
+      } else {
+        console.error(`❌ Background database setup exited with code ${code}`);
+      }
+    });
+  }
 });
 
 module.exports = app;
