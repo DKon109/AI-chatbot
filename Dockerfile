@@ -20,4 +20,4 @@ COPY medical-ai-enhanced/backend/ ./
 COPY --from=frontend-build /app/frontend/dist ./public
 
 EXPOSE 5001
-CMD ["node", "server.js"]
+CMD ["npm", "run", "start:production"]

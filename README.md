@@ -20,7 +20,7 @@ All included portfolio data is fictional. This project is an educational softwar
 - PostgreSQL persistence with parameterized queries and connection pooling
 - Repeatable database migrations and deterministic portfolio seed data
 - Dockerized production build serving React and Express from one service
-- Railway configuration with pre-deploy migrations and health checks
+- Render Free and Railway deployment configuration with automatic migrations and health checks
 
 ## Architecture
 
@@ -42,7 +42,7 @@ The production container builds the React frontend and serves it from Express. T
 | Backend | Node.js, Express, JWT, bcrypt, Helmet, express-validator |
 | Data | PostgreSQL, SQL migrations, UUID primary keys |
 | AI workflow | Multi-agent services, structured symptom analysis, optional OpenAI integration |
-| Delivery | Docker, Railway config-as-code, health checks |
+| Delivery | Docker, Render/Railway config-as-code, health checks |
 
 ## Demo accounts
 
@@ -104,6 +104,20 @@ The repository includes [`Dockerfile`](Dockerfile) and [`railway.json`](railway.
 
 Railway pricing and free allowances can change; review the current plan before deployment. The Docker image is portable to other container hosts, and the database only requires a standard PostgreSQL connection URL.
 
+## Free portfolio deployment (Render + Supabase)
+
+The repository includes [`render.yaml`](render.yaml), which creates a Render web service with the Free instance type explicitly selected. Supabase supplies the free hosted PostgreSQL database.
+
+1. Create a Supabase Free project and keep its generated database password private.
+2. In Supabase, open **Connect**, select the session pooler connection string, and replace the password placeholder locally.
+3. In Render, create a new Blueprint from this repository.
+4. Paste the completed connection string into Render's `DATABASE_URL` prompt. Do not commit it or post it in an issue/chat.
+5. Confirm that the service plan is **Free**, then deploy.
+
+The container runs the idempotent migrations and fictional demo seed before starting the server. Render generates `JWT_SECRET` automatically. No OpenAI or Google Maps key is required for the core portfolio demo.
+
+Render Free services can sleep after a period without traffic, so the first request after inactivity can take about a minute. Free-tier terms and limits can change; confirm the provider dashboards still show **Free / $0** before deployment.
+
 ## Security decisions
 
 - `.env` files, dependencies, generated model files, logs, and runtime feedback are excluded from Git.
@@ -120,6 +134,7 @@ If a secret was committed in an earlier revision, it must be rotated even after 
 ```text
 .
 ├── Dockerfile
+├── render.yaml
 ├── railway.json
 └── medical-ai-enhanced
     ├── backend
