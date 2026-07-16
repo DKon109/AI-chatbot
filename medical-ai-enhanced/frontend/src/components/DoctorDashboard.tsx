@@ -7,6 +7,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import ApiService from '../services/api';
 import { Patient, DietRecommendation } from '../types';
+import './DashboardTheme.css';
 
 const DoctorDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'patients' | 'diet' | 'ai-instructions'>('patients');
@@ -175,14 +176,14 @@ const DoctorDashboard: React.FC = () => {
   }
 
   return (
-    <div style={{
+    <div className="compass-dashboard doctor-compass" style={{
       minHeight: '100vh',
       backgroundColor: '#f8fafc',
       display: 'flex',
       flexDirection: 'column'
     }}>
       {/* Header */}
-      <header style={{
+      <header className="compass-header" style={{
         backgroundColor: 'white',
         padding: '1rem 2rem',
         borderBottom: '1px solid #e2e8f0',
@@ -224,6 +225,7 @@ const DoctorDashboard: React.FC = () => {
         
         <div style={{ display: 'flex', gap: '1rem' }}>
           <button
+            className="compass-secondary-button"
             onClick={handleBackToHome}
             style={{
               display: 'flex',
@@ -243,6 +245,7 @@ const DoctorDashboard: React.FC = () => {
             Home
           </button>
           <button
+            className="compass-logout-button"
             onClick={handleLogout}
             style={{
               display: 'flex',
@@ -265,13 +268,14 @@ const DoctorDashboard: React.FC = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <div style={{
+      <div className="compass-sidebar" style={{
         backgroundColor: 'white',
         borderBottom: '1px solid #e2e8f0',
         padding: '0 2rem'
       }}>
         <div style={{ display: 'flex', gap: '2rem' }}>
           <button
+            className={`compass-nav-item ${activeTab === 'patients' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('patients')}
             style={{
               padding: '1rem 0',
@@ -291,6 +295,7 @@ const DoctorDashboard: React.FC = () => {
             Patient Management
           </button>
           <button
+            className={`compass-nav-item ${activeTab === 'diet' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('diet')}
             style={{
               padding: '1rem 0',
@@ -310,6 +315,7 @@ const DoctorDashboard: React.FC = () => {
             Diet Recommendations
           </button>
           <button
+            className={`compass-nav-item ${activeTab === 'ai-instructions' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('ai-instructions')}
             style={{
               padding: '1rem 0',
@@ -332,7 +338,7 @@ const DoctorDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <main style={{
+      <main className="compass-workspace" style={{
         flex: 1,
         padding: '2rem',
         maxWidth: '1200px',

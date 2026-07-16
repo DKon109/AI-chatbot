@@ -1,0 +1,246 @@
+:root {
+  --compass-ink: #001e2b;
+  --compass-muted: #5c6c75;
+  --compass-green: #00684a;
+  --compass-green-hover: #00553d;
+  --compass-mint: #e3fcf7;
+  --compass-leaf: #00ed64;
+  --compass-canvas: #f9fbfa;
+  --compass-sidebar: #f3f6f5;
+  --compass-border: #c1c7c6;
+}
+
+.compass-dashboard {
+  min-height: 100vh !important;
+  display: grid !important;
+  grid-template-columns: 252px minmax(0, 1fr) !important;
+  grid-template-rows: 64px minmax(0, 1fr) !important;
+  background: var(--compass-canvas) !important;
+  color: var(--compass-ink);
+  font-family: "Euclid Circular A", "Inter", "Avenir Next", Avenir,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  text-align: left;
+}
+
+.compass-dashboard *,
+.compass-dashboard *::before,
+.compass-dashboard *::after {
+  box-sizing: border-box;
+}
+
+.compass-header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  min-width: 0;
+  padding: 0 24px !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #e8edeb !important;
+  box-shadow: none !important;
+  z-index: 5;
+}
+
+.compass-header h1 {
+  color: var(--compass-ink) !important;
+  font-size: 20px !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em;
+}
+
+.compass-header span {
+  color: var(--compass-muted) !important;
+}
+
+.compass-header svg {
+  color: var(--compass-green) !important;
+  stroke: currentColor !important;
+}
+
+.compass-secondary-button,
+.compass-logout-button {
+  min-height: 36px;
+  border: 1px solid #889397 !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  color: var(--compass-ink) !important;
+  box-shadow: none !important;
+  font-family: inherit !important;
+  font-weight: 600 !important;
+}
+
+.compass-secondary-button:hover,
+.compass-logout-button:hover {
+  background: #f1f5f4 !important;
+  border-color: var(--compass-green) !important;
+  color: var(--compass-green) !important;
+}
+
+.compass-sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  width: 252px;
+  min-width: 252px;
+  padding: 18px 12px !important;
+  background: var(--compass-sidebar) !important;
+  border-right: 1px solid #e1e7e5 !important;
+  border-bottom: 0 !important;
+  overflow-y: auto;
+}
+
+.compass-sidebar::before {
+  content: "WORKSPACE";
+  display: block;
+  padding: 0 10px 10px;
+  color: var(--compass-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.compass-sidebar > div {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 4px !important;
+  width: 100%;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.compass-nav-item {
+  width: 100%;
+  min-height: 42px;
+  justify-content: flex-start;
+  padding: 10px 12px !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: var(--compass-ink) !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  text-align: left;
+}
+
+.compass-nav-item:hover {
+  background: #e8eeec !important;
+}
+
+.compass-nav-item.is-active {
+  background: #dfe7e5 !important;
+  color: var(--compass-ink) !important;
+  font-weight: 650 !important;
+  box-shadow: inset 3px 0 0 var(--compass-green);
+}
+
+.compass-nav-item svg {
+  color: var(--compass-green);
+  stroke: currentColor;
+}
+
+.compass-workspace {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 32px 36px !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(0, 237, 100, 0.055), transparent 260px),
+    #ffffff !important;
+  overflow-x: hidden;
+}
+
+.compass-workspace h1,
+.compass-workspace h2,
+.compass-workspace h3,
+.compass-workspace h4 {
+  color: var(--compass-ink) !important;
+  letter-spacing: -0.015em;
+}
+
+.compass-workspace p,
+.compass-workspace label,
+.compass-workspace span {
+  font-family: inherit;
+}
+
+.compass-workspace > div[style*="background-color: white"],
+.compass-workspace > div[style*="backgroundColor: white"] {
+  border: 1px solid #e1e7e5 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 30, 43, 0.06) !important;
+}
+
+.compass-workspace button {
+  font-family: inherit !important;
+}
+
+.compass-workspace input,
+.compass-workspace textarea,
+.compass-workspace select {
+  border-color: #889397 !important;
+  border-radius: 6px !important;
+  color: var(--compass-ink) !important;
+  font-family: inherit !important;
+}
+
+.compass-workspace input:focus,
+.compass-workspace textarea:focus,
+.compass-workspace select:focus {
+  border-color: var(--compass-green) !important;
+  outline: 2px solid rgba(0, 104, 74, 0.16) !important;
+  outline-offset: 1px;
+}
+
+@media (max-width: 900px) {
+  .compass-dashboard {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+  }
+
+  .compass-header {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 64px;
+    padding: 10px 16px !important;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .compass-sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 12px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid #e1e7e5 !important;
+    overflow-x: auto;
+  }
+
+  .compass-sidebar::before {
+    display: none;
+  }
+
+  .compass-sidebar > div {
+    flex-direction: row !important;
+    min-width: max-content;
+  }
+
+  .compass-nav-item {
+    width: auto;
+  }
+
+  .compass-nav-item.is-active {
+    box-shadow: inset 0 -3px 0 var(--compass-green);
+  }
+
+  .compass-workspace {
+    grid-column: 1;
+    grid-row: 3;
+    padding: 22px 16px !important;
+  }
+}

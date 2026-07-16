@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import ApiService from '../services/api';
 import StructuredSymptomAnalysis from './StructuredSymptomAnalysis';
 import GoogleMapsPharmacyFinder from './GoogleMapsPharmacyFinder';
+import './DashboardTheme.css';
 
 const PatientDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'symptom-checker' | 'food-analysis' | 'exercises' | 'reports' | 'motivation' | 'prescriptions'>('symptom-checker');
@@ -50,14 +51,14 @@ const PatientDashboard: React.FC = () => {
   };
 
   return (
-    <div style={{
+    <div className="compass-dashboard patient-compass" style={{
       minHeight: '100vh',
       backgroundColor: '#f8fafc',
       display: 'flex',
       flexDirection: 'column'
     }}>
       {/* Header */}
-      <header style={{
+      <header className="compass-header" style={{
         backgroundColor: 'white',
         borderBottom: '1px solid #e2e8f0',
         padding: '1rem 2rem',
@@ -68,6 +69,7 @@ const PatientDashboard: React.FC = () => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button
+            className="compass-secondary-button"
             onClick={() => navigate('/')}
             style={{
               display: 'flex',
@@ -106,6 +108,7 @@ const PatientDashboard: React.FC = () => {
             Welcome, {user?.name || 'Patient'}
           </span>
           <button
+            className="compass-logout-button"
             onClick={handleLogout}
             style={{
               display: 'flex',
@@ -135,7 +138,7 @@ const PatientDashboard: React.FC = () => {
       </header>
 
       {/* Tab Navigation */}
-      <div style={{
+      <div className="compass-sidebar" style={{
         backgroundColor: 'white',
         borderBottom: '1px solid #e2e8f0',
         padding: '0 2rem'
@@ -149,6 +152,7 @@ const PatientDashboard: React.FC = () => {
           paddingBottom: '0.5rem'
         }}>
           <button
+            className={`compass-nav-item ${activeTab === 'symptom-checker' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('symptom-checker')}
             style={{
               display: 'flex',
@@ -170,6 +174,7 @@ const PatientDashboard: React.FC = () => {
             Symptom Checker
           </button>
           <button
+            className={`compass-nav-item ${activeTab === 'food-analysis' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('food-analysis')}
             style={{
               display: 'flex',
@@ -191,6 +196,7 @@ const PatientDashboard: React.FC = () => {
             Food Analysis
           </button>
           <button
+            className={`compass-nav-item ${activeTab === 'exercises' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('exercises')}
             style={{
               display: 'flex',
@@ -212,6 +218,7 @@ const PatientDashboard: React.FC = () => {
             Exercises
           </button>
           <button
+            className={`compass-nav-item ${activeTab === 'reports' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('reports')}
             style={{
               display: 'flex',
@@ -233,6 +240,7 @@ const PatientDashboard: React.FC = () => {
             Reports
           </button>
           <button
+            className={`compass-nav-item ${activeTab === 'motivation' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('motivation')}
             style={{
               display: 'flex',
@@ -254,6 +262,7 @@ const PatientDashboard: React.FC = () => {
             Motivation
           </button>
           <button
+            className={`compass-nav-item ${activeTab === 'prescriptions' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('prescriptions')}
             style={{
               display: 'flex',
@@ -278,7 +287,7 @@ const PatientDashboard: React.FC = () => {
       </div>
 
       {/* Main Content Area */}
-      <main style={{
+      <main className="compass-workspace" style={{
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
