@@ -91,7 +91,7 @@ const HomePage: React.FC = () => {
               backdropFilter: 'blur(10px)',
               animation: 'float 3s ease-in-out infinite'
             }}>
-              <Bot size={60} color="white" />
+              <Bot size={60} color="#00684a" strokeWidth={2.25} />
             </div>
             
             <h1 style={{
@@ -150,7 +150,7 @@ const HomePage: React.FC = () => {
                 borderRadius: '50%',
                 margin: '0 auto 1.5rem'
               }}>
-                <User size={40} color="white" />
+                <User size={40} color="#00684a" strokeWidth={2.25} />
               </div>
               <h3 style={{
                 fontSize: '1.5rem',
@@ -236,7 +236,7 @@ const HomePage: React.FC = () => {
                 borderRadius: '50%',
                 margin: '0 auto 1.5rem'
               }}>
-                <Stethoscope size={40} color="white" />
+                <Stethoscope size={40} color="#00684a" strokeWidth={2.25} />
               </div>
               <h3 style={{
                 fontSize: '1.5rem',
