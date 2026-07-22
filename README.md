@@ -1,22 +1,33 @@
-# MedAI Pro
+# MedAI Pro — Secure Healthcare Workflow Prototype
 
-Full-stack healthcare portfolio application with separate patient and doctor experiences, structured symptom analysis, patient record management, and AI-assisted health guidance.
+[![CI](https://github.com/DKon109/AI-chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/DKon109/AI-chatbot/actions/workflows/ci.yml)
+[![Live Demo](https://img.shields.io/badge/demo-live-00684a)](https://medai-pro-instant-demo.onrender.com/)
+
+A secure full-stack healthcare workflow prototype demonstrating role-based access, structured symptom intake, deterministic safety guidance, patient record management, and repeatable PostgreSQL delivery.
 
 > **[Open Live Demo](https://medai-pro-instant-demo.onrender.com/)** · **[View GitHub](https://github.com/DKon109/AI-chatbot)**
 >
 > The landing page is served as a free static site and opens immediately. Interactive login and analysis use a separate Render Free API, which can take up to 60 seconds to wake after inactivity. The page starts waking it in the background as soon as a visitor arrives.
 
+![MedAI Pro patient and doctor portal landing page](docs/medai-pro-home.jpg)
+
 ## Product overview
 
-MedAI Pro explores how a role-based healthcare assistant can combine conversational guidance with structured clinical workflows. Patients can record symptoms and receive safety-focused guidance, while doctors can manage fictional patient records and review supporting information from a dedicated dashboard.
+MedAI Pro explores how secure role-based software can support structured healthcare workflows. Patients can record symptoms and receive safety-focused next-step guidance, while doctors can manage fictional patient records and document supporting instructions from a dedicated dashboard.
 
 All included portfolio data is fictional. This project is an educational software demonstration and does not provide medical diagnosis or replace professional medical care.
+
+### What “AI-enhanced” means here
+
+The public portfolio demo uses **deterministic analysis by default**. The same structured input produces predictable guidance without requiring a paid model API. This makes the core workflow reproducible, testable, available at no API cost, and easier to review safely.
+
+An OpenAI-backed service layer is present as an **optional integration point** for environments that explicitly configure a provider key. It is not required for authentication, patient management, symptom intake, hospital search, food guidance, or the public demo. The application presents decision support—not medical diagnosis—and does not imply that a language model has clinically validated its output.
 
 ## Highlights
 
 - Patient and doctor registration/login with JWT authentication
 - Role-based protected routes and dashboards
-- Structured symptom collection and severity-aware responses
+- Structured symptom collection and deterministic, severity-aware responses
 - Patient record CRUD workflows for doctors
 - Chat history, dietary recommendations, pharmacy search, and hospital search
 - PostgreSQL persistence with parameterized queries and connection pooling
@@ -31,7 +42,7 @@ flowchart LR
     U["Portfolio visitor"] --> W["React 19 + TypeScript<br/>Render Static Site / CDN"]
     W -->|"HTTPS API calls<br/>background wake-up"| A["Node.js + Express<br/>Render Free Web Service"]
     A --> D[("PostgreSQL")]
-    A --> S["AI and healthcare services"]
+    A --> S["Deterministic guidance services<br/>Optional AI provider integration"]
 ```
 
 The recruiter-facing frontend is deployed as a static site, so the first screen does not depend on a sleeping server. It immediately sends a background health request to the Free API. Interactive requests allow enough time for a normal cold start and show a clear startup message instead of a generic network error. The Docker image still contains the combined frontend and API as a portable fallback.
@@ -43,7 +54,7 @@ The recruiter-facing frontend is deployed as a static site, so the first screen 
 | Frontend | React 19, TypeScript, Vite, React Router, Axios, Lucide React |
 | Backend | Node.js, Express, JWT, bcrypt, Helmet, express-validator |
 | Data | PostgreSQL, SQL migrations, UUID primary keys |
-| AI workflow | Deterministic symptom analysis, multi-agent service design, optional OpenAI integration |
+| Decision support | Deterministic symptom analysis by default, service-oriented agent design, optional OpenAI integration |
 | Delivery | Docker, Render/Railway config-as-code, health checks |
 
 ## Demo accounts
@@ -155,7 +166,8 @@ If a secret was committed in an earlier revision, it must be rotated even after 
 
 ## Current limitations
 
-- AI provider features require a separately configured API key; deterministic local analysis remains available without one.
+- The public demo does not rely on generative AI; optional provider-backed features require a separately configured API key.
+- Deterministic guidance is educational decision support, not a clinically validated diagnostic system.
 - Location-based pharmacy and hospital functionality depends on external map/search services.
 - The application is a portfolio prototype and has not undergone clinical validation or production compliance certification.
 

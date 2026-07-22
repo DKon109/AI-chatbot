@@ -1,7 +1,7 @@
 {
   "name": "medical-ai-backend",
   "version": "1.0.0",
-  "description": "Enhanced Medical AI Chatbot Backend",
+  "description": "Secure healthcare workflow prototype backend with deterministic decision support",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

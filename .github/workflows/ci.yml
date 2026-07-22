@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend tests and production build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: medical-ai-enhanced/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: medical-ai-enhanced/frontend/package-lock.json
+      - run: npm ci
+      - run: npm test -- --run
+      - run: npm run build
+
+  backend:
+    name: Backend dependency and syntax checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: medical-ai-enhanced/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: medical-ai-enhanced/backend/package-lock.json
+      - run: npm ci
+      - name: Check JavaScript syntax
+        run: |
+          for file in agents/*.js config/*.js controllers/*.js middleware/*.js routes/*.js scripts/*.js services/*.js server.js; do
+            node --check "$file"
+          done
+
+  container:
+    name: Docker production build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: medai-pro:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

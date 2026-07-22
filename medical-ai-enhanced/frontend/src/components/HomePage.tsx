@@ -111,7 +111,7 @@ const HomePage: React.FC = () => {
               marginBottom: '1rem',
               textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
             }}>
-              Medical AI Assistant
+              Secure Healthcare Workflow
             </h1>
             <p style={{
               fontSize: '1.5rem',
@@ -120,7 +120,7 @@ const HomePage: React.FC = () => {
               maxWidth: '600px',
               margin: '0 auto 2rem'
             }}>
-              Intelligent Health Consultation · Professional Medical Support
+              Role-based patient and doctor portals · Deterministic guidance by default
             </p>
             <div className={`demo-api-status is-${apiStatus}`} role="status" aria-live="polite">
               {apiStatus === 'ready' ? (
@@ -184,7 +184,7 @@ const HomePage: React.FC = () => {
                 marginBottom: '1.5rem',
                 lineHeight: '1.6'
               }}>
-                Get personalized health consultations and symptom analysis from our AI assistant
+                Record symptoms through a structured, safety-focused workflow and review clear next-step guidance
               </p>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                 <button
@@ -270,7 +270,7 @@ const HomePage: React.FC = () => {
                 marginBottom: '1.5rem',
                 lineHeight: '1.6'
               }}>
-                Manage patients, provide AI-assisted diagnosis, and access comprehensive medical tools
+                Manage fictional patient records, review structured guidance, and document care instructions
               </p>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                 <button
