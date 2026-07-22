@@ -346,7 +346,7 @@ For support and questions:
 
 ## 🔮 Future Enhancements
 
-- **Real AI Integration**: Connect to OpenAI GPT or similar
+- **Real AI Integration**: Gemini structured extraction with a deterministic fallback
 - **Medical Image Analysis**: Upload and analyze medical images
 - **Appointment Scheduling**: Integrated calendar system
 - **Prescription Management**: Digital prescription system

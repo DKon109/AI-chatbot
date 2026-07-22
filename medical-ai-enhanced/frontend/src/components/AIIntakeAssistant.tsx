@@ -27,7 +27,7 @@ interface IntakeResult {
     matchedRules: string[];
     decisionSource: string;
   };
-  generationMode: 'openai_structured_output' | 'portfolio_demo';
+  generationMode: 'gemini_structured_output' | 'portfolio_demo';
   model: string | null;
   disclaimer: string;
 }
@@ -102,8 +102,8 @@ const AIIntakeAssistant: React.FC = () => {
       {result && (
         <div className="ai-intake-result" aria-live="polite">
           <div className="ai-result-toolbar">
-            <span className={`ai-mode-badge ${result.generationMode === 'openai_structured_output' ? 'is-live' : ''}`}>
-              {result.generationMode === 'openai_structured_output' ? 'Live structured AI' : 'Free portfolio demo'}
+            <span className={`ai-mode-badge ${result.generationMode === 'gemini_structured_output' ? 'is-live' : ''}`}>
+              {result.generationMode === 'gemini_structured_output' ? 'Gemini structured AI' : 'Free portfolio demo'}
             </span>
             <span className="review-badge"><ClipboardList size={14} /> Clinician review: pending</span>
           </div>

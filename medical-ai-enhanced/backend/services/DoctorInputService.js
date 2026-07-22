@@ -1,9 +1,9 @@
 const pool = require('../config/database');
-const OpenAIService = require('./OpenAIService');
+const GeminiService = require('./GeminiService');
 
 class DoctorInputService {
   constructor() {
-    this.openai = new OpenAIService();
+    this.ai = new GeminiService();
   }
 
   parseJsonValue(value) {
@@ -42,7 +42,7 @@ class DoctorInputService {
 
       // Generate personalized AI agent based on instructions
       const patientData = await this.getPatientData(patientId);
-      const personalizedAgent = await this.openai.generatePersonalizedAgent(patientData, instructions);
+      const personalizedAgent = await this.ai.generatePersonalizedAgent(patientData, instructions);
 
       // Store the personalized agent configuration
       await client.query(`
@@ -154,7 +154,7 @@ class DoctorInputService {
       throw new Error('No personalized AI agent found. Doctor needs to provide instructions first.');
     }
 
-    return await this.openai.analyzeSymptomsWithContext(
+    return await this.ai.analyzeSymptomsWithContext(
       symptoms,
       patientData,
       personalizedAgent.instructions
@@ -172,7 +172,7 @@ class DoctorInputService {
       throw new Error('No personalized AI agent found. Doctor needs to provide instructions first.');
     }
 
-    return await this.openai.generateMealRecommendations(
+    return await this.ai.generateMealRecommendations(
       mealData,
       patientData,
       personalizedAgent.instructions
@@ -190,7 +190,7 @@ class DoctorInputService {
       throw new Error('No personalized AI agent found. Doctor needs to provide instructions first.');
     }
 
-    return await this.openai.generateExerciseRecommendations(
+    return await this.ai.generateExerciseRecommendations(
       patientData,
       personalizedAgent.instructions,
       currentActivity
@@ -208,7 +208,7 @@ class DoctorInputService {
       throw new Error('No personalized AI agent found. Doctor needs to provide instructions first.');
     }
 
-    return await this.openai.generateMotivationMessage(
+    return await this.ai.generateMotivationMessage(
       patientData,
       personalizedAgent.instructions,
       actionType
@@ -229,7 +229,7 @@ class DoctorInputService {
     // Get patient data for the specified time frame
     const timeFrameData = await this.getPatientTimeFrameData(patientId, timeFrame);
 
-    return await this.openai.generateProgressReport(
+    return await this.ai.generateProgressReport(
       timeFrameData,
       personalizedAgent.instructions,
       timeFrame

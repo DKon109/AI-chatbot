@@ -19,15 +19,15 @@ All included portfolio data is fictional. This project is an educational softwar
 
 ### What “AI-enhanced” means here
 
-Patients can describe a concern in natural language. When an OpenAI key is configured, the backend uses the [Responses API with Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) and a strict JSON Schema to extract symptoms, duration, severity, missing information, and a clinician-facing draft. The model is explicitly prevented from diagnosing, prescribing, or deciding urgency.
+Patients can describe a concern in natural language. When a Gemini API key is configured, the backend uses the [Gemini Interactions API with Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output) and a strict JSON Schema to extract symptoms, duration, severity, missing information, and a clinician-facing draft. The default model is the stable, Free-Tier-eligible `gemini-3.1-flash-lite`. The model is explicitly prevented from diagnosing, prescribing, or deciding urgency.
 
 Safety remains a separate deterministic layer: fixed, testable rules inspect the original patient text and can override the draft with an immediate-action message. Every submission enters the Doctor Portal as `pending`; a clinician must approve it or request changes. The UI identifies whether a result came from live structured AI or the transparent free portfolio fallback.
 
-The public deployment remains free and leaves `OPENAI_API_KEY` unset. Recruiters can still exercise the complete intake, safety, persistence, and human-review workflow with fictional examples. Environments that explicitly add a key activate real structured model extraction without changing the safety or review architecture.
+If `GEMINI_API_KEY` is absent, recruiters can still exercise the complete intake, safety, persistence, and human-review workflow with fictional examples through the deterministic portfolio fallback. Adding a Gemini Free Tier key activates real structured model extraction without changing the safety or review architecture. Provider requests are stateless (`store: false`) and do not include a patient account ID.
 
 ```mermaid
 flowchart LR
-    P["Patient free text"] --> X["OpenAI structured extraction<br/>or free demo fallback"]
+    P["Patient free text"] --> X["Gemini structured extraction<br/>or free demo fallback"]
     P --> G["Deterministic safety guardrails"]
     X --> D["Clinician draft"]
     G --> D
@@ -58,7 +58,7 @@ flowchart LR
     U["Portfolio visitor"] --> W["React 19 + TypeScript<br/>Render Static Site / CDN"]
     W -->|"HTTPS API calls<br/>background wake-up"| A["Node.js + Express<br/>Render Free Web Service"]
     A --> D[("PostgreSQL")]
-    A --> S["OpenAI structured extraction<br/>Deterministic safety + fallback"]
+    A --> S["Gemini structured extraction<br/>Deterministic safety + fallback"]
 ```
 
 The recruiter-facing frontend is deployed as a static site, so the first screen does not depend on a sleeping server. It immediately sends a background health request to the Free API. Interactive requests allow enough time for a normal cold start and show a clear startup message instead of a generic network error. The Docker image still contains the combined frontend and API as a portable fallback.
@@ -70,7 +70,7 @@ The recruiter-facing frontend is deployed as a static site, so the first screen 
 | Frontend | React 19, TypeScript, Vite, React Router, Axios, Lucide React |
 | Backend | Node.js, Express, JWT, bcrypt, Helmet, express-validator |
 | Data | PostgreSQL, SQL migrations, UUID primary keys |
-| Decision support | OpenAI Responses API + Structured Outputs, deterministic safety guardrails, clinician review, free fallback |
+| Decision support | Gemini Interactions API + Structured Outputs, deterministic safety guardrails, clinician review, free fallback |
 | Delivery | Docker, Render/Railway config-as-code, health checks |
 
 ## Demo accounts
@@ -112,11 +112,11 @@ The frontend runs at `http://localhost:3000`; the API defaults to `http://localh
 The complete workflow works without a model provider. To activate live structured extraction locally, set these only in `backend/.env` or a hosting provider's secret settings:
 
 ```bash
-OPENAI_API_KEY=your_private_key
-OPENAI_MODEL=gpt-5.6-sol
+GEMINI_API_KEY=your_private_key
+GEMINI_MODEL=gemini-3.1-flash-lite
 ```
 
-Never expose the key through a `VITE_` variable, commit it, or paste it into the application UI. Model requests use `store: false`; the included demo accounts and examples are fictional. Do not use this portfolio prototype for real patient or protected health information.
+Never expose the key through a `VITE_` variable, commit it, or paste it into the application UI. Model requests use `store: false`; the included demo accounts and examples are fictional. Gemini Free Tier inputs may be used to improve Google products, so do not use this portfolio prototype for real patient or protected health information.
 
 ### Database commands
 
@@ -155,8 +155,10 @@ The repository includes [`render.yaml`](render.yaml), which creates two services
 2. In Render, create a new Blueprint from this repository.
 3. Enter only the Supabase database password in Render's `DB_PASSWORD` prompt. Do not commit it or post it in an issue/chat.
 4. Confirm that the service plan is **Free**, then deploy.
+5. To enable live AI, create a key in a Gemini API Free Tier project, then add it only to the `medai-pro-portfolio` service as a secret environment variable named `GEMINI_API_KEY`.
+6. Keep `GEMINI_MODEL=gemini-3.1-flash-lite`, save the environment settings, and redeploy.
 
-The API container starts accepting health requests before running its idempotent migrations and fictional demo seed in the background. Render generates `JWT_SECRET` automatically. No OpenAI or Google Maps key is required for the core portfolio demo. The Blueprint intentionally does not request an OpenAI key, so deploying the free configuration cannot create model usage charges.
+The API container starts accepting health requests before running its idempotent migrations and fictional demo seed in the background. Render generates `JWT_SECRET` automatically. No Gemini or Google Maps key is required for the core portfolio demo. The Blueprint intentionally does not contain a provider key. A Gemini key is added manually in Render so it never appears in GitHub.
 
 The static landing page remains immediately available even when the API is asleep. The UI starts waking the API during the visitor's first read and clearly explains that the first interactive action can take up to 60 seconds. Free-tier terms and usage allowances can change; confirm the provider dashboards still show **Free / $0** before deployment.
 
@@ -193,7 +195,7 @@ If a secret was committed in an earlier revision, it must be rotated even after 
 
 ## Current limitations
 
-- The free public demo exercises the full AI-shaped workflow using a clearly labelled deterministic extraction fallback; live model extraction requires a separately configured API key and may incur provider usage charges.
+- The application uses Gemini structured extraction when `GEMINI_API_KEY` is configured and a clearly labelled deterministic fallback otherwise. Free Tier quotas and terms can change, and requests fall back safely when a quota or provider error occurs.
 - Deterministic guidance is educational decision support, not a clinically validated diagnostic system.
 - AI output is always a draft and has not been clinically validated; human review is mandatory by design.
 - Location-based pharmacy and hospital functionality depends on external map/search services.

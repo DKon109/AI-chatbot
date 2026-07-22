@@ -27,28 +27,21 @@ test('deterministic guardrail overrides the draft for emergency language', async
   assert.match(result.safetyAssessment.action, /emergency services/i);
 });
 
-test('uses strict structured output without storing provider requests', async () => {
+test('uses Gemini structured output without storing provider requests', async () => {
   let request;
   const client = {
-    responses: {
+    interactions: {
       create: async (payload) => {
         request = payload;
         return {
-          status: 'completed',
-          output: [{
-            type: 'message',
-            content: [{
-              type: 'output_text',
-              text: JSON.stringify({
-                symptoms: [{ name: 'Headache', duration: 'today', severity: 'mild', qualifiers: [] }],
-                reportedRedFlags: [],
-                missingInformation: ['Any other symptoms?'],
-                patientFriendlySummary: 'A headache was reported.',
-                clinicianDraft: 'Patient reports a mild headache today.',
-                uncertainty: 'Cause is not assessed.'
-              })
-            }]
-          }]
+          output_text: JSON.stringify({
+            symptoms: [{ name: 'Headache', duration: 'today', severity: 'mild', qualifiers: [] }],
+            reportedRedFlags: [],
+            missingInformation: ['Any other symptoms?'],
+            patientFriendlySummary: 'A headache was reported.',
+            clinicianDraft: 'Patient reports a mild headache today.',
+            uncertainty: 'Cause is not assessed.'
+          })
         };
       }
     }
@@ -57,10 +50,39 @@ test('uses strict structured output without storing provider requests', async ()
   const liveService = new AIIntakeService({ client, model: 'test-model' });
   const result = await liveService.createIntake({ narrative: 'I have a mild headache today.', userId: 'fictional-user' });
 
-  assert.equal(result.generationMode, 'openai_structured_output');
+  assert.equal(result.generationMode, 'gemini_structured_output');
   assert.equal(result.model, 'test-model');
   assert.equal(request.store, false);
-  assert.equal(request.text.format.type, 'json_schema');
-  assert.equal(request.text.format.strict, true);
-  assert.equal(request.safety_identifier.length, 64);
+  assert.equal(request.response_format.type, 'text');
+  assert.equal(request.response_format.mime_type, 'application/json');
+  assert.deepEqual(request.response_format.schema.required, [
+    'symptoms',
+    'reportedRedFlags',
+    'missingInformation',
+    'patientFriendlySummary',
+    'clinicianDraft',
+    'uncertainty'
+  ]);
+  assert.match(request.system_instruction, /do not diagnose/i);
+});
+
+test('falls back safely when Gemini returns an incomplete structure', async () => {
+  const client = {
+    interactions: {
+      create: async () => ({ output_text: JSON.stringify({ symptoms: [] }) })
+    }
+  };
+  const liveService = new AIIntakeService({ client, model: 'test-model' });
+  const originalConsoleError = console.error;
+  console.error = () => {};
+  let result;
+  try {
+    result = await liveService.createIntake({ narrative: 'I have a mild headache today.', userId: 'fictional-user' });
+  } finally {
+    console.error = originalConsoleError;
+  }
+
+  assert.equal(result.generationMode, 'portfolio_demo');
+  assert.equal(result.structuredIntake.symptoms[0].name, 'Headache');
+  assert.equal(result.safetyAssessment.decisionSource, 'deterministic_guardrail');
 });

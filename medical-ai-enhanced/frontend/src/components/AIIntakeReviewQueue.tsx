@@ -93,7 +93,13 @@ const AIIntakeReviewQueue: React.FC = () => {
                     {item.safety_assessment.urgency === 'immediate' ? <AlertTriangle size={13} /> : <ShieldCheck size={13} />}
                     {item.safety_assessment.urgency}
                   </span>
-                  <span>{item.generation_mode === 'openai_structured_output' ? `OpenAI · ${item.model}` : 'Free demo fallback'}</span>
+                  <span>
+                    {item.generation_mode === 'gemini_structured_output'
+                      ? `Gemini · ${item.model}`
+                      : item.generation_mode === 'openai_structured_output'
+                        ? `Legacy OpenAI · ${item.model}`
+                        : 'Free demo fallback'}
+                  </span>
                   <span>{item.review_status.replace('_', ' ')}</span>
                 </div>
               </div>

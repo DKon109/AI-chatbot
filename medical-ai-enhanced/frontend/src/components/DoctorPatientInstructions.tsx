@@ -163,7 +163,7 @@ const DoctorPatientInstructions: React.FC = () => {
           Patient Guidance Studio
         </h1>
         <p className="text-gray-600">
-          Save structured, patient-specific guidance. The free demo builds a deterministic profile; OpenAI can be enabled separately.
+          Save structured, patient-specific guidance. Gemini enhances the draft when configured; the free demo remains available as a deterministic fallback.
         </p>
       </div>
 
