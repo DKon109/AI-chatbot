@@ -313,6 +313,29 @@ class ApiService {
     return response.data;
   }
 
+  async createAIIntake(narrative: string) {
+    const response: AxiosResponse<any> = await this.api.post('/ai/intake-assistant', { narrative });
+    return response.data;
+  }
+
+  async getMyAIIntakes() {
+    const response: AxiosResponse<any> = await this.api.get('/ai/intake-assistant/mine');
+    return response.data;
+  }
+
+  async getAIIntakeReviews() {
+    const response: AxiosResponse<any> = await this.api.get('/doctor/intake-reviews');
+    return response.data;
+  }
+
+  async reviewAIIntake(id: string, status: 'approved' | 'needs_changes', clinicianNotes: string) {
+    const response: AxiosResponse<any> = await this.api.patch(`/doctor/intake-reviews/${id}`, {
+      status,
+      clinicianNotes
+    });
+    return response.data;
+  }
+
   async findNearbyPharmacies(latitude: number, longitude: number, radius: number = 5000) {
     const response: AxiosResponse<any> = await this.api.get('/pharmacy/nearby', {
       params: { latitude, longitude, radius }

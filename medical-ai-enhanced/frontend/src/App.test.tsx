@@ -5,5 +5,5 @@ import App from './App';
 test('renders the MedAI Pro landing page', () => {
   render(<App />);
   expect(screen.getByRole('heading', { name: 'Secure Healthcare Workflow' })).toBeInTheDocument();
-  expect(screen.getByText(/Deterministic guidance by default/i)).toBeInTheDocument();
+  expect(screen.getByText(/AI-assisted intake · Deterministic safety · Clinician review/i)).toBeInTheDocument();
 });

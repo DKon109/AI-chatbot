@@ -6,6 +6,7 @@ const migrations = [
   'schema.sql',
   'ai_agents_schema.sql',
   'doctor_ai_schema.sql',
+  'ai_intake_schema.sql',
 ];
 
 async function migrate() {

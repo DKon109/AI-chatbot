@@ -16,6 +16,7 @@ const aiRoutes = require('./routes/ai');
 const doctorAiRoutes = require('./routes/doctor-ai');
 const pharmacyRoutes = require('./routes/pharmacy');
 const hospitalRoutes = require('./routes/hospital');
+const dietRoutes = require('./routes/diet');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -64,7 +65,7 @@ app.use((req, res, next) => {
       return callback(new Error('Origin is not allowed by CORS'));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
   })(req, res, next);
 });
@@ -85,6 +86,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/doctor', doctorAiRoutes);
 app.use('/api/pharmacy', pharmacyRoutes);
 app.use('/api/hospital', hospitalRoutes);
+app.use('/api/diet', dietRoutes);
 
 // Health check endpoint
 app.get('/api/status', (req, res) => {

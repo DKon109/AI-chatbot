@@ -2,10 +2,66 @@ const express = require('express');
 const router = express.Router();
 const DoctorInputService = require('../services/DoctorInputService');
 const { authenticateToken, requireDoctor, requirePatient } = require('../middleware/auth');
+const pool = require('../config/database');
 
 const doctorInputService = new DoctorInputService();
 
 router.use(authenticateToken);
+
+/**
+ * @route GET /api/doctor/intake-reviews
+ * @desc List AI-assisted intake drafts waiting for human review
+ * @access Doctor
+ */
+router.get('/intake-reviews', requireDoctor, async (req, res, next) => {
+  try {
+    const result = await pool.query(`
+      SELECT r.id, r.raw_input, r.structured_intake, r.safety_assessment,
+             r.generation_mode, r.model, r.review_status, r.clinician_notes,
+             r.reviewed_at, r.created_at,
+             p.id AS patient_id, p.name AS patient_name, p.email AS patient_email,
+             d.name AS reviewer_name
+      FROM ai_intake_reviews r
+      JOIN users p ON p.id = r.patient_id
+      LEFT JOIN users d ON d.id = r.reviewed_by
+      ORDER BY
+        CASE r.review_status WHEN 'pending' THEN 0 ELSE 1 END,
+        r.created_at DESC
+      LIMIT 50
+    `);
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @route PATCH /api/doctor/intake-reviews/:id
+ * @desc Approve an AI draft or request changes; never auto-approves
+ * @access Doctor
+ */
+router.patch('/intake-reviews/:id', requireDoctor, async (req, res, next) => {
+  try {
+    const { status, clinicianNotes = '' } = req.body;
+    if (!['approved', 'needs_changes'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'A valid review status is required.' });
+    }
+
+    const result = await pool.query(`
+      UPDATE ai_intake_reviews
+      SET review_status = $1, clinician_notes = $2, reviewed_by = $3, reviewed_at = NOW()
+      WHERE id = $4
+      RETURNING id, review_status, clinician_notes, reviewed_at
+    `, [status, String(clinicianNotes).trim().slice(0, 2000), req.userId, req.params.id]);
+
+    if (!result.rows.length) {
+      return res.status(404).json({ success: false, error: 'Intake draft not found.' });
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * @route GET /api/doctor/patients

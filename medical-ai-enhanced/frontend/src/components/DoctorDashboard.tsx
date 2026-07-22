@@ -2,16 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Stethoscope, User, LogOut, Home, Plus, Search, Edit, Trash2, 
-  Users, FileText, Eye, ArrowLeft, Brain
+  Users, FileText, Eye, ArrowLeft, Brain, ClipboardCheck
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import ApiService from '../services/api';
 import { Patient, DietRecommendation } from '../types';
 import './DashboardTheme.css';
 import DoctorPatientInstructions from './DoctorPatientInstructions';
+import AIIntakeReviewQueue from './AIIntakeReviewQueue';
 
 const DoctorDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'patients' | 'diet' | 'ai-instructions'>('patients');
+  const [activeTab, setActiveTab] = useState<'patients' | 'diet' | 'ai-instructions' | 'ai-review'>('patients');
   const [patients, setPatients] = useState<Patient[]>([]);
   const [dietRecommendations, setDietRecommendations] = useState<DietRecommendation[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -219,7 +220,7 @@ const DoctorDashboard: React.FC = () => {
           }}>
             <User size={16} color="#64748b" />
             <span style={{ color: '#64748b', fontSize: '0.9rem' }}>
-              Dr. {user.name}
+              {/^(dr\.?\s)/i.test(user.name) ? user.name : `Dr. ${user.name}`}
             </span>
           </div>
         </div>
@@ -334,6 +335,19 @@ const DoctorDashboard: React.FC = () => {
           >
             <Brain size={20} />
             AI Instructions
+          </button>
+          <button
+            className={`compass-nav-item ${activeTab === 'ai-review' ? 'is-active' : ''}`}
+            onClick={() => setActiveTab('ai-review')}
+            style={{
+              padding: '1rem 0', border: 'none', backgroundColor: 'transparent',
+              color: activeTab === 'ai-review' ? '#10b981' : '#64748b',
+              borderBottom: activeTab === 'ai-review' ? '2px solid #10b981' : '2px solid transparent',
+              cursor: 'pointer', fontSize: '1rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.5rem'
+            }}
+          >
+            <ClipboardCheck size={20} />
+            AI Intake Review
           </button>
         </div>
       </div>
@@ -786,8 +800,10 @@ const DoctorDashboard: React.FC = () => {
               ))}
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'ai-instructions' ? (
           <DoctorPatientInstructions />
+        ) : (
+          <AIIntakeReviewQueue />
         )}
       </main>
 

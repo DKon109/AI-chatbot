@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import ApiService from '../services/api';
 import HospitalFinder from './HospitalFinder';
+import AIIntakeAssistant from './AIIntakeAssistant';
 import './SymptomFlow.css';
 
 interface SymptomCategory {
@@ -504,6 +505,7 @@ const StructuredSymptomAnalysis: React.FC = () => {
 
   return (
     <div className="symptom-flow">
+      <AIIntakeAssistant />
       <div className="symptom-progress-rail" aria-label="Symptom checker progress">
         {stepLabels.map((label, index) => (
           <div key={label} className={index <= currentStepIndex ? 'is-active' : ''}>

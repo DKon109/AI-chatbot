@@ -3,7 +3,7 @@
 [![CI](https://github.com/DKon109/AI-chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/DKon109/AI-chatbot/actions/workflows/ci.yml)
 [![Live Demo](https://img.shields.io/badge/demo-live-00684a)](https://medai-pro-instant-demo.onrender.com/)
 
-A secure full-stack healthcare workflow prototype demonstrating role-based access, structured symptom intake, deterministic safety guidance, patient record management, and repeatable PostgreSQL delivery.
+A secure full-stack healthcare workflow prototype demonstrating role-based access, AI-assisted symptom intake, deterministic safety guidance, clinician review, patient record management, and repeatable PostgreSQL delivery.
 
 > **[Open Live Demo](https://medai-pro-instant-demo.onrender.com/)** · **[View GitHub](https://github.com/DKon109/AI-chatbot)**
 >
@@ -19,15 +19,31 @@ All included portfolio data is fictional. This project is an educational softwar
 
 ### What “AI-enhanced” means here
 
-The public portfolio demo uses **deterministic analysis by default**. The same structured input produces predictable guidance without requiring a paid model API. This makes the core workflow reproducible, testable, available at no API cost, and easier to review safely.
+Patients can describe a concern in natural language. When an OpenAI key is configured, the backend uses the [Responses API with Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) and a strict JSON Schema to extract symptoms, duration, severity, missing information, and a clinician-facing draft. The model is explicitly prevented from diagnosing, prescribing, or deciding urgency.
 
-An OpenAI-backed service layer is present as an **optional integration point** for environments that explicitly configure a provider key. It is not required for authentication, patient management, symptom intake, hospital search, food guidance, or the public demo. The application presents decision support—not medical diagnosis—and does not imply that a language model has clinically validated its output.
+Safety remains a separate deterministic layer: fixed, testable rules inspect the original patient text and can override the draft with an immediate-action message. Every submission enters the Doctor Portal as `pending`; a clinician must approve it or request changes. The UI identifies whether a result came from live structured AI or the transparent free portfolio fallback.
+
+The public deployment remains free and leaves `OPENAI_API_KEY` unset. Recruiters can still exercise the complete intake, safety, persistence, and human-review workflow with fictional examples. Environments that explicitly add a key activate real structured model extraction without changing the safety or review architecture.
+
+```mermaid
+flowchart LR
+    P["Patient free text"] --> X["OpenAI structured extraction<br/>or free demo fallback"]
+    P --> G["Deterministic safety guardrails"]
+    X --> D["Clinician draft"]
+    G --> D
+    D --> R{"Doctor review"}
+    R -->|Approve| A["Clinician-approved record"]
+    R -->|Needs changes| C["Correction requested"]
+```
 
 ## Highlights
 
 - Patient and doctor registration/login with JWT authentication
 - Role-based protected routes and dashboards
 - Structured symptom collection and deterministic, severity-aware responses
+- Natural-language intake with strict structured output and provider-independent fallback
+- Human-in-the-loop Doctor Portal queue with approve / needs-changes audit state
+- Deterministic emergency guardrails that do not delegate urgency to a language model
 - Patient record CRUD workflows for doctors
 - Chat history, dietary recommendations, pharmacy search, and hospital search
 - PostgreSQL persistence with parameterized queries and connection pooling
@@ -42,7 +58,7 @@ flowchart LR
     U["Portfolio visitor"] --> W["React 19 + TypeScript<br/>Render Static Site / CDN"]
     W -->|"HTTPS API calls<br/>background wake-up"| A["Node.js + Express<br/>Render Free Web Service"]
     A --> D[("PostgreSQL")]
-    A --> S["Deterministic guidance services<br/>Optional AI provider integration"]
+    A --> S["OpenAI structured extraction<br/>Deterministic safety + fallback"]
 ```
 
 The recruiter-facing frontend is deployed as a static site, so the first screen does not depend on a sleeping server. It immediately sends a background health request to the Free API. Interactive requests allow enough time for a normal cold start and show a clear startup message instead of a generic network error. The Docker image still contains the combined frontend and API as a portable fallback.
@@ -54,7 +70,7 @@ The recruiter-facing frontend is deployed as a static site, so the first screen 
 | Frontend | React 19, TypeScript, Vite, React Router, Axios, Lucide React |
 | Backend | Node.js, Express, JWT, bcrypt, Helmet, express-validator |
 | Data | PostgreSQL, SQL migrations, UUID primary keys |
-| Decision support | Deterministic symptom analysis by default, service-oriented agent design, optional OpenAI integration |
+| Decision support | OpenAI Responses API + Structured Outputs, deterministic safety guardrails, clinician review, free fallback |
 | Delivery | Docker, Render/Railway config-as-code, health checks |
 
 ## Demo accounts
@@ -90,6 +106,17 @@ cd frontend && npm install && npm start
 ```
 
 The frontend runs at `http://localhost:3000`; the API defaults to `http://localhost:5001`.
+
+### Optional live AI mode
+
+The complete workflow works without a model provider. To activate live structured extraction locally, set these only in `backend/.env` or a hosting provider's secret settings:
+
+```bash
+OPENAI_API_KEY=your_private_key
+OPENAI_MODEL=gpt-5.6-sol
+```
+
+Never expose the key through a `VITE_` variable, commit it, or paste it into the application UI. Model requests use `store: false`; the included demo accounts and examples are fictional. Do not use this portfolio prototype for real patient or protected health information.
 
 ### Database commands
 
@@ -129,7 +156,7 @@ The repository includes [`render.yaml`](render.yaml), which creates two services
 3. Enter only the Supabase database password in Render's `DB_PASSWORD` prompt. Do not commit it or post it in an issue/chat.
 4. Confirm that the service plan is **Free**, then deploy.
 
-The API container starts accepting health requests before running its idempotent migrations and fictional demo seed in the background. Render generates `JWT_SECRET` automatically. No OpenAI or Google Maps key is required for the core portfolio demo.
+The API container starts accepting health requests before running its idempotent migrations and fictional demo seed in the background. Render generates `JWT_SECRET` automatically. No OpenAI or Google Maps key is required for the core portfolio demo. The Blueprint intentionally does not request an OpenAI key, so deploying the free configuration cannot create model usage charges.
 
 The static landing page remains immediately available even when the API is asleep. The UI starts waking the API during the visitor's first read and clearly explains that the first interactive action can take up to 60 seconds. Free-tier terms and usage allowances can change; confirm the provider dashboards still show **Free / $0** before deployment.
 
@@ -166,8 +193,9 @@ If a secret was committed in an earlier revision, it must be rotated even after 
 
 ## Current limitations
 
-- The public demo does not rely on generative AI; optional provider-backed features require a separately configured API key.
+- The free public demo exercises the full AI-shaped workflow using a clearly labelled deterministic extraction fallback; live model extraction requires a separately configured API key and may incur provider usage charges.
 - Deterministic guidance is educational decision support, not a clinically validated diagnostic system.
+- AI output is always a draft and has not been clinically validated; human review is mandatory by design.
 - Location-based pharmacy and hospital functionality depends on external map/search services.
 - The application is a portfolio prototype and has not undergone clinical validation or production compliance certification.
 

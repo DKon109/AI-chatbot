@@ -1,15 +1,94 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const { authenticateToken, requirePatient } = require('../middleware/auth');
 const AIAgentManager = require('../agents/AIAgentManager');
+const AIIntakeService = require('../services/AIIntakeService');
+const pool = require('../config/database');
 
 const router = express.Router();
 
 // Initialize AI Agent Manager
 const aiManager = new AIAgentManager();
+const aiIntakeService = new AIIntakeService();
+const intakeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Please wait before creating another AI-assisted intake.' }
+});
 // const continuousLearning = new ContinuousLearningSystem(); // Will implement JS version
 
 // All AI routes require authentication
 router.use(authenticateToken);
+
+/**
+ * @route POST /api/ai/intake-assistant
+ * @desc Structure free-text intake, then apply deterministic safety rules
+ * @access Patient
+ */
+router.post('/intake-assistant', requirePatient, intakeLimiter, async (req, res, next) => {
+  try {
+    const narrative = typeof req.body.narrative === 'string' ? req.body.narrative.trim() : '';
+    if (narrative.length < 10 || narrative.length > 2000) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please describe the concern using 10 to 2,000 characters.'
+      });
+    }
+
+    const intake = await aiIntakeService.createIntake({ narrative, userId: req.userId });
+    const saved = await pool.query(`
+      INSERT INTO ai_intake_reviews (
+        patient_id, raw_input, structured_intake, safety_assessment, generation_mode, model
+      ) VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id, review_status, created_at
+    `, [
+      req.userId,
+      narrative,
+      JSON.stringify(intake.structuredIntake),
+      JSON.stringify(intake.safetyAssessment),
+      intake.generationMode,
+      intake.model
+    ]);
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: saved.rows[0].id,
+        reviewStatus: saved.rows[0].review_status,
+        createdAt: saved.rows[0].created_at,
+        ...intake
+      }
+    });
+  } catch (error) {
+    if (/required|characters/i.test(error.message)) {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+    next(error);
+  }
+});
+
+/**
+ * @route GET /api/ai/intake-assistant/mine
+ * @desc Return the patient's own recent intake drafts and review status
+ * @access Patient
+ */
+router.get('/intake-assistant/mine', requirePatient, async (req, res, next) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, structured_intake, safety_assessment, generation_mode, model,
+             review_status, clinician_notes, reviewed_at, created_at
+      FROM ai_intake_reviews
+      WHERE patient_id = $1
+      ORDER BY created_at DESC
+      LIMIT 10
+    `, [req.userId]);
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * @route POST /api/ai/symptom-analysis

@@ -33,7 +33,7 @@ jobs:
       - run: npm run build
 
   backend:
-    name: Backend dependency and syntax checks
+    name: Backend tests and syntax checks
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -46,6 +46,7 @@ jobs:
           cache: npm
           cache-dependency-path: medical-ai-enhanced/backend/package-lock.json
       - run: npm ci
+      - run: npm test
       - name: Check JavaScript syntax
         run: |
           for file in agents/*.js config/*.js controllers/*.js middleware/*.js routes/*.js scripts/*.js services/*.js server.js; do

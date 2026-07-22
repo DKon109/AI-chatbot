@@ -120,7 +120,7 @@ const HomePage: React.FC = () => {
               maxWidth: '600px',
               margin: '0 auto 2rem'
             }}>
-              Role-based patient and doctor portals · Deterministic guidance by default
+              AI-assisted intake · Deterministic safety · Clinician review
             </p>
             <div className={`demo-api-status is-${apiStatus}`} role="status" aria-live="polite">
               {apiStatus === 'ready' ? (
@@ -328,9 +328,9 @@ const HomePage: React.FC = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Zap size={32} color="white" style={{ marginBottom: '1rem' }} />
-              <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Structured Guidance</h4>
+              <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>AI-Assisted Intake</h4>
               <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem' }}>
-                Deterministic symptom analysis with safety-focused recommendations
+                Natural-language drafts with fixed safety guardrails and human approval
               </p>
             </div>
             <div style={{
