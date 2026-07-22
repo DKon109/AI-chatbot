@@ -31,7 +31,10 @@ app.use(helmet());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
+  // Render polls this endpoint frequently. Counting platform health checks can
+  // incorrectly mark a healthy Free instance as failed with HTTP 429.
+  skip: (req) => req.path === '/api/status'
 });
 app.use(limiter);
 

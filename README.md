@@ -2,7 +2,9 @@
 
 Full-stack healthcare portfolio application with separate patient and doctor experiences, structured symptom analysis, patient record management, and AI-assisted health guidance.
 
-> **Live portfolio demo:** [medai-pro-portfolio.onrender.com](https://medai-pro-portfolio.onrender.com/)
+> **[Open Live Demo](https://medai-pro-instant-demo.onrender.com/)** · **[View GitHub](https://github.com/DKon109/AI-chatbot)**
+>
+> The landing page is served as a free static site and opens immediately. Interactive login and analysis use a separate Render Free API, which can take up to 60 seconds to wake after inactivity. The page starts waking it in the background as soon as a visitor arrives.
 
 ## Product overview
 
@@ -19,20 +21,20 @@ All included portfolio data is fictional. This project is an educational softwar
 - Chat history, dietary recommendations, pharmacy search, and hospital search
 - PostgreSQL persistence with parameterized queries and connection pooling
 - Repeatable database migrations and deterministic portfolio seed data
-- Dockerized production build serving React and Express from one service
-- Render Free and Railway deployment configuration with automatic migrations and health checks
+- Dockerized full-stack production build for portable deployment
+- Instant-loading Render Static Site with a separate Free API, automatic migrations, and health checks
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    U["Portfolio visitor"] --> W["React 19 + TypeScript"]
-    W -->|"/api"| A["Node.js + Express"]
+    U["Portfolio visitor"] --> W["React 19 + TypeScript<br/>Render Static Site / CDN"]
+    W -->|"HTTPS API calls<br/>background wake-up"| A["Node.js + Express<br/>Render Free Web Service"]
     A --> D[("PostgreSQL")]
     A --> S["AI and healthcare services"]
 ```
 
-The production container builds the React frontend and serves it from Express. This provides one public origin, avoids cross-origin setup for normal production traffic, and keeps deployment easy to review.
+The recruiter-facing frontend is deployed as a static site, so the first screen does not depend on a sleeping server. It immediately sends a background health request to the Free API. Interactive requests allow enough time for a normal cold start and show a clear startup message instead of a generic network error. The Docker image still contains the combined frontend and API as a portable fallback.
 
 ## Technology
 
@@ -106,16 +108,19 @@ Railway pricing and free allowances can change; review the current plan before d
 
 ## Free portfolio deployment (Render + Supabase)
 
-The repository includes [`render.yaml`](render.yaml), which creates a Render web service with the Free instance type explicitly selected. Supabase supplies the free hosted PostgreSQL database.
+The repository includes [`render.yaml`](render.yaml), which creates two services while keeping the instance configuration free:
+
+- `medai-pro-instant-demo`: static React site served from Render's CDN; it does not have a server process that spins down.
+- `medai-pro-portfolio`: Free Express API connected to the Supabase Free PostgreSQL database; it can spin down after inactivity.
 
 1. Create a Supabase Free project and keep its generated database password private.
 2. In Render, create a new Blueprint from this repository.
 3. Enter only the Supabase database password in Render's `DB_PASSWORD` prompt. Do not commit it or post it in an issue/chat.
 4. Confirm that the service plan is **Free**, then deploy.
 
-The container runs the idempotent migrations and fictional demo seed before starting the server. Render generates `JWT_SECRET` automatically. No OpenAI or Google Maps key is required for the core portfolio demo.
+The API container starts accepting health requests before running its idempotent migrations and fictional demo seed in the background. Render generates `JWT_SECRET` automatically. No OpenAI or Google Maps key is required for the core portfolio demo.
 
-Render Free services can sleep after a period without traffic, so the first request after inactivity can take about a minute. Free-tier terms and limits can change; confirm the provider dashboards still show **Free / $0** before deployment.
+The static landing page remains immediately available even when the API is asleep. The UI starts waking the API during the visitor's first read and clearly explains that the first interactive action can take up to 60 seconds. Free-tier terms and usage allowances can change; confirm the provider dashboards still show **Free / $0** before deployment.
 
 ## Security decisions
 
