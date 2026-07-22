@@ -207,4 +207,4 @@ If a secret was committed in an earlier revision, it must be rotated even after 
 curl http://localhost:5001/api/status
 ```
 
-A healthy service returns a JSON response with `status: "success"`.
+A healthy service returns `status: "success"` plus the non-secret Gemini provider, model, and active mode. It never returns the API key.

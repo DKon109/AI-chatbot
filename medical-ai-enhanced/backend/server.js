@@ -94,7 +94,12 @@ app.get('/api/status', (req, res) => {
     status: 'success',
     message: 'Medical AI Backend is running',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    version: '1.1.0',
+    ai: {
+      provider: 'gemini',
+      model: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite',
+      mode: process.env.GEMINI_API_KEY ? 'structured_ai' : 'portfolio_demo_fallback'
+    }
   });
 });
 
