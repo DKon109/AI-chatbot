@@ -13,6 +13,7 @@ import {
   Utensils,
   Heart
 } from 'lucide-react';
+import ApiService from '../services/api';
 import './InstructionStudio.css';
 
 interface Patient {
@@ -63,12 +64,7 @@ const DoctorPatientInstructions: React.FC = () => {
   const loadPatients = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/doctor/patients', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      const data = await ApiService.getDoctorPatients();
       if (data.success) {
         setPatients(data.data);
       } else {
@@ -83,12 +79,7 @@ const DoctorPatientInstructions: React.FC = () => {
 
   const loadInstructionHistory = async (patientId: string) => {
     try {
-      const response = await fetch(`/api/doctor/instructions/${patientId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
+      const data = await ApiService.getDoctorInstructionHistory(patientId);
       if (data.success) {
         setInstructionHistory(data.data);
       }
@@ -105,19 +96,7 @@ const DoctorPatientInstructions: React.FC = () => {
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/doctor/instructions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          patientId: selectedPatient.id,
-          instructions: instructions
-        })
-      });
-
-      const data = await response.json();
+      const data = await ApiService.saveDoctorInstructions(selectedPatient.id, instructions);
       if (data.success) {
         setMessage({ type: 'success', text: 'Instructions saved and the patient guidance profile is ready.' });
         setInstructions({

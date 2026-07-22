@@ -336,6 +336,24 @@ class ApiService {
     return response.data;
   }
 
+  async getDoctorPatients() {
+    const response: AxiosResponse<any> = await this.api.get('/doctor/patients');
+    return response.data;
+  }
+
+  async getDoctorInstructionHistory(patientId: string) {
+    const response: AxiosResponse<any> = await this.api.get(`/doctor/instructions/${patientId}`);
+    return response.data;
+  }
+
+  async saveDoctorInstructions(patientId: string, instructions: Record<string, string>) {
+    const response: AxiosResponse<any> = await this.api.post('/doctor/instructions', {
+      patientId,
+      instructions
+    });
+    return response.data;
+  }
+
   async findNearbyPharmacies(latitude: number, longitude: number, radius: number = 5000) {
     const response: AxiosResponse<any> = await this.api.get('/pharmacy/nearby', {
       params: { latitude, longitude, radius }
