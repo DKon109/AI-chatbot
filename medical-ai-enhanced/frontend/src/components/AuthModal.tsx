@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AuthModalProps {
@@ -20,6 +20,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, userType, onClose }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showColdStartNotice, setShowColdStartNotice] = useState(false);
 
   const { login, register } = useAuth();
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, userType, onClose }) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setShowColdStartNotice(false);
+    const coldStartTimer = window.setTimeout(() => setShowColdStartNotice(true), 2500);
 
     try {
       if (mode === 'login') {
@@ -51,9 +54,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, userType, onClose }) => {
       navigate(redirectPath);
     } catch (err: any) {
       console.error('Auth error:', err);
-      setError(err.message || 'An error occurred');
+      const isNetworkDelay = err.isAxiosError && (!err.response || err.code === 'ECONNABORTED');
+      setError(isNetworkDelay
+        ? 'The free demo API is still starting. Please wait a moment and try again.'
+        : (err.response?.data?.message || err.message || 'An error occurred'));
     } finally {
+      window.clearTimeout(coldStartTimer);
       setIsLoading(false);
+      setShowColdStartNotice(false);
     }
   };
 
@@ -151,6 +159,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, userType, onClose }) => {
           </div>
         )}
 
+        {showColdStartNotice && (
+          <div className="auth-wake-notice" role="status" aria-live="polite">
+            <LoaderCircle size={18} />
+            <div>
+              <strong>Starting the free demo API…</strong>
+              <span>The first login after inactivity can take up to 60 seconds. Please keep this window open.</span>
+            </div>
+          </div>
+        )}
+
         {mode === 'login' && (
           <div style={{
             backgroundColor: '#eff6ff',
@@ -162,6 +180,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ mode, userType, onClose }) => {
           }}>
             <p style={{ color: '#475569', fontSize: '0.85rem', margin: '0 0 0.5rem' }}>
               Portfolio demo using fictional data
+            </p>
+            <p style={{ color: '#64748b', fontSize: '0.78rem', margin: '0 0 0.35rem' }}>
+              The page loads instantly; the free API may need up to 60 seconds for the first login.
             </p>
             <button
               type="button"

@@ -19,7 +19,9 @@ class ApiService {
   constructor() {
     this.api = axios.create({
       baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
-      timeout: 10000,
+      // Render Free APIs can take close to a minute to wake. Keeping the
+      // request alive avoids turning a normal cold start into a network error.
+      timeout: 75000,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -272,6 +274,17 @@ class ApiService {
   async healthCheck(): Promise<HealthCheckResponse> {
     const response: AxiosResponse<HealthCheckResponse> = await this.api.get('/health');
     return response.data;
+  }
+
+  // Start waking the Free API as soon as the static landing page loads.
+  // This is intentionally unauthenticated and safe to call in the background.
+  async wakeBackend(): Promise<boolean> {
+    try {
+      await this.api.get('/status', { timeout: 75000 });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   // Utility methods

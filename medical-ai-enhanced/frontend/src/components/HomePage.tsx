@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
-import { Bot, Stethoscope, User, Shield, Zap, Heart } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Bot, Stethoscope, User, Shield, Zap, Heart, CheckCircle2, LoaderCircle } from 'lucide-react';
 import AuthModal from './AuthModal';
+import ApiService from '../services/api';
 import './HomeTheme.css';
 
 const HomePage: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [userType, setUserType] = useState<'patient' | 'doctor'>('patient');
+  const [apiStatus, setApiStatus] = useState<'waking' | 'ready' | 'unavailable'>('waking');
+
+  useEffect(() => {
+    let active = true;
+    ApiService.wakeBackend().then((ready) => {
+      if (active) setApiStatus(ready ? 'ready' : 'unavailable');
+    });
+    return () => { active = false; };
+  }, []);
 
   const handleAuthClick = (mode: 'login' | 'register', type: 'patient' | 'doctor') => {
     setAuthMode(mode);
@@ -112,6 +122,15 @@ const HomePage: React.FC = () => {
             }}>
               Intelligent Health Consultation · Professional Medical Support
             </p>
+            <div className={`demo-api-status is-${apiStatus}`} role="status" aria-live="polite">
+              {apiStatus === 'ready' ? (
+                <><CheckCircle2 size={17} /> Interactive demo ready</>
+              ) : apiStatus === 'waking' ? (
+                <><LoaderCircle className="status-spinner" size={17} /> Preparing the free interactive demo in the background (up to 60 seconds)</>
+              ) : (
+                <>The interface is ready. If login is slow, retry in a moment.</>
+              )}
+            </div>
           </div>
 
           {/* Portal Cards */}

@@ -89,6 +89,70 @@
   line-height: 1.55;
 }
 
+.demo-api-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 9px 12px;
+  border: 1px solid #b8c4c0;
+  border-radius: 6px;
+  background: #fff;
+  color: #3d4f58;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.demo-api-status.is-ready {
+  border-color: #78cbb0;
+  background: #e3fcf7;
+  color: #00684a;
+}
+
+.demo-api-status.is-waking {
+  border-color: #e8c56a;
+  background: #fff8dc;
+  color: #644d00;
+}
+
+.status-spinner {
+  animation: status-spin 1s linear infinite;
+}
+
+.auth-wake-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid #e8c56a;
+  border-radius: 8px;
+  background: #fff8dc;
+  color: #644d00;
+  text-align: left;
+}
+
+.auth-wake-notice svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  animation: status-spin 1s linear infinite;
+}
+
+.auth-wake-notice strong,
+.auth-wake-notice span {
+  display: block;
+}
+
+.auth-wake-notice span {
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@keyframes status-spin {
+  to { transform: rotate(360deg); }
+}
+
 .compass-portal-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 20px !important;
